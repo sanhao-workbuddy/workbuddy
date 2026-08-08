@@ -1,4 +1,4 @@
-const CACHE = 'sanhao-workbench-v10';  // v10: 修复 jsdelivr CDN 的 text/plain content-type 问题
+const CACHE = 'sanhao-workbench-v11';  // v11: 修复 PWA 从主屏幕启动时 content-type 问题
 
 /* ---- 所有需要预缓存的资源（含 HTML） ---- */
 const PRECACHE_ASSETS = [

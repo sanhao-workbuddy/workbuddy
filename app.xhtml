@@ -25,16 +25,25 @@
     //<![CDATA[
     // 入口页：注册 Service Worker 后跳转到主页面
     // jsdelivr CDN 把 .html 当 text/plain 返回，SW 拦截后修复为 text/html
+    // PWA 从主屏幕启动时必须先走此入口页（manifest start_url = app.xhtml）
+    var redirected = false;
+    function go() {
+      if (redirected) return;
+      redirected = true;
+      location.replace('工作台.html');
+    }
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js').then(function() {
         return navigator.serviceWorker.ready;
       }).then(function() {
-        location.replace('工作台.html');
+        go();
       }).catch(function() {
-        location.replace('工作台.html');
+        go();
       });
+      // 超时保护：SW 注册超过 8 秒还没 ready 就直接跳
+      setTimeout(go, 8000);
     } else {
-      location.replace('工作台.html');
+      go();
     }
     //]]>
   </script>
