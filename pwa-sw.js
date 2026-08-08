@@ -1,4 +1,4 @@
-const CACHE = 'sanhao-workbench-v11';  // v11: 修复 PWA 从主屏幕启动时 content-type 问题
+const CACHE = 'sanhao-workbench-v12';  // v12: 拦截 manifest.json 请求，替换为 pwa-manifest.json
 
 /* ---- 所有需要预缓存的资源（含 HTML） ---- */
 const PRECACHE_ASSETS = [
@@ -56,6 +56,23 @@ self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
 
   const url = new URL(e.request.url);
+
+  // 拦截 manifest.json 请求 → 返回 pwa-manifest.json（确保 start_url = pwa.xhtml）
+  // 原因：工作台.html 引用的是旧 manifest.json，CDN 缓存里 start_url 仍为 工作台.html
+  if (url.pathname.endsWith('/manifest.json') && !url.pathname.includes('pwa-manifest')) {
+    e.respondWith(
+      caches.match('pwa-manifest.json').then(cached => {
+        if (cached) return cached;
+        return fetch('pwa-manifest.json').then(r => {
+          const clone = r.clone();
+          caches.open(CACHE).then(c => c.put('pwa-manifest.json', clone));
+          return r;
+        }).catch(() => caches.match('pwa-manifest.json'));
+      })
+    );
+    return;
+  }
+
   const isPage = e.request.mode === 'navigate' || url.pathname.includes('%E5%B7%A5') || url.pathname.includes('工作台');
 
   e.respondWith(
