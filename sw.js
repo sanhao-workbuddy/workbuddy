@@ -1,4 +1,4 @@
-const CACHE = 'sanhao-workbench-v9';  // v9: 适配 GitHub Pages 云端部署
+const CACHE = 'sanhao-workbench-v10';  // v10: 修复 jsdelivr CDN 的 text/plain content-type 问题
 
 /* ---- 所有需要预缓存的资源（含 HTML） ---- */
 const PRECACHE_ASSETS = [
@@ -9,11 +9,32 @@ const PRECACHE_ASSETS = [
   'icon-180.png'
 ];
 
+/* ---- 修复 jsdelivr 把 .html 当 text/plain 返回的问题 ---- */
+function fixHtmlContentType(response) {
+  const ct = response.headers.get('Content-Type') || '';
+  if (ct.includes('text/plain')) {
+    return new Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers: {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'no-cache'
+      }
+    });
+  }
+  return response;
+}
+
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE).then(c =>
-      // 逐个缓存，某个失败不影响其他
-      Promise.allSettled(PRECACHE_ASSETS.map(url => c.add(url)))
+      Promise.allSettled(PRECACHE_ASSETS.map(url =>
+        fetch(url).then(response => {
+          if (!response.ok) return;
+          const fixed = url === '工作台.html' ? fixHtmlContentType(response) : response;
+          return c.put(url, fixed);
+        }).catch(err => console.log('Precache failed:', url, err))
+      ))
     )
   );
   self.skipWaiting();
@@ -30,24 +51,26 @@ self.addEventListener('activate', e => {
 
 /* ---- 缓存优先 + 后台更新（Stale-While-Revalidate） ---- */
 /* 核心逻辑：有缓存就秒开，后台静默更新；没缓存才走网络 */
+/* 额外：修复 jsdelivr CDN 的 text/plain content-type → text/html */
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
 
+  const url = new URL(e.request.url);
+  const isPage = e.request.mode === 'navigate' || url.pathname.includes('%E5%B7%A5') || url.pathname.includes('工作台');
+
   e.respondWith(
     caches.match(e.request).then(cached => {
-
-      const url = new URL(e.request.url);
-      const isPage = e.request.mode === 'navigate' || url.pathname.includes('%E5%B7%A5') || url.pathname.includes('工作台');
 
       // 后台静默拉取最新版本（不阻塞用户）
       const backgroundUpdate = fetch(e.request)
         .then(response => {
           if (response && response.status === 200) {
-            const clone = response.clone();
+            // 对 HTML 页面修复 content-type
+            const fixed = isPage ? fixHtmlContentType(response) : response;
+            const clone = fixed.clone();
             caches.open(CACHE).then(c => c.put(e.request, clone));
             // 如果是主页面更新了，通知前端刷新
             if (isPage && cached) {
-              // 对比新旧内容是否不同
               Promise.all([cached.text(), clone.text()]).then(([oldText, newText]) => {
                 if (oldText !== newText) {
                   self.clients.matchAll().then(clients => {
@@ -56,6 +79,7 @@ self.addEventListener('fetch', e => {
                 }
               });
             }
+            return fixed;
           }
           return response;
         })
