@@ -1,0 +1,1904 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="三好个人工作台" />
+<meta name="theme-color" content="#FAF6EF" />
+<meta name="mobile-web-app-capable" content="yes" />
+<link rel="manifest" href="manifest.json" />
+<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+<title>三好个人工作台</title>
+<style>
+  /* ================= 基础变量 ================= */
+  :root {
+    --bg:        #FAF6EF;          /* 米色背景，参考原图 */
+    --paper:     #FFFFFF;
+    --line:      #E8DFD0;          /* 浅棕线条 */
+    --ink:       #2B2A28;          /* 主文字 */
+    --ink-soft:  #6F6A63;          /* 副文字 */
+    --ink-fade:  #A39C92;          /* 浅文字 */
+    --orange:    #D97757;          /* 强调橘 */
+    --orange-bg: #FCEEE6;          /* 强调橘浅背景 */
+    --green:     #5B8C5A;          /* 涨（A股惯例：红涨绿跌，这里用绿代表"利好"语境不够严谨，按惯例用 红=#C0392B，绿=#27AE60）*/
+    --red:       #C0392B;          /* 涨 红 */
+    --down:      #27AE60;          /* 跌 绿 */
+    --gold:      #C8A95E;
+    --pink:      #E58FA8;
+    --shadow:    0 2px 8px rgba(46,36,18,.06), 0 8px 28px rgba(46,36,18,.06);
+    --radius:    14px;
+    --radius-lg: 22px;
+    --sidebar-w: 220px;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro SC", "PingFang SC",
+                 "Helvetica Neue", "Segoe UI", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+
+  button { font-family: inherit; }
+
+  /* ================= 总体布局 ================= */
+  .app {
+    display: grid;
+    grid-template-columns: var(--sidebar-w) 1fr;
+    height: 100vh;
+    height: 100dvh;
+  }
+
+  /* ================= 侧边栏 ================= */
+  .sidebar {
+    background: linear-gradient(180deg, #F5EBD9 0%, #F1E4CC 100%);
+    border-right: 1px solid var(--line);
+    padding: 18px 12px 14px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+  .sidebar::-webkit-scrollbar { width: 6px; }
+  .sidebar::-webkit-scrollbar-thumb { background: rgba(0,0,0,.08); border-radius: 3px; }
+
+  .brand {
+    display: flex; align-items: center; gap: 9px;
+    padding: 6px 8px 16px;
+  }
+  .brand .logo {
+    width: 30px; height: 30px; border-radius: 9px;
+    background: var(--orange);
+    display: grid; place-items: center;
+    color: #fff; font-weight: 800;
+    box-shadow: 0 4px 10px rgba(217,119,87,.35);
+  }
+  .brand .name { font-weight: 700; font-size: 15px; }
+  .brand .sub  { font-size: 11px; color: var(--ink-soft); }
+
+  .group { margin-top: 14px; }
+  .group-title {
+    font-size: 10px; letter-spacing: .12em; color: var(--ink-fade);
+    padding: 4px 10px 6px; text-transform: uppercase;
+  }
+
+  .nav { display: flex; flex-direction: column; gap: 2px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 10px; border-radius: 10px;
+    cursor: pointer; user-select: none;
+    color: var(--ink-soft); font-size: 13.5px;
+    transition: background .18s, color .18s, transform .12s;
+  }
+  .nav-item:hover { background: rgba(255,255,255,.5); color: var(--ink); }
+  .nav-item.active {
+    background: var(--orange); color: #fff;
+    box-shadow: 0 6px 14px rgba(217,119,87,.32);
+  }
+  .nav-item.active .ico { background: rgba(255,255,255,.18); }
+  .nav-item .ico {
+    width: 24px; height: 24px; border-radius: 7px;
+    background: #fff;
+    display: grid; place-items: center;
+    font-size: 13px;
+  }
+  .nav-item .badge {
+    margin-left: auto; font-size: 10px;
+    background: var(--orange-bg); color: var(--orange);
+    padding: 2px 6px; border-radius: 10px; font-weight: 600;
+  }
+  .nav-item.active .badge { background: rgba(255,255,255,.22); color: #fff; }
+
+  /* ================= 主区 ================= */
+  .main {
+    overflow-y: auto;
+    padding: 22px 28px 60px;
+    background: var(--bg);
+  }
+  .topbar {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 22px;
+  }
+  .topbar h1 {
+    margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -.01em;
+  }
+  .topbar .date {
+    margin-left: auto;
+    color: var(--ink-soft); font-size: 13px;
+    background: var(--paper); padding: 8px 14px;
+    border-radius: 999px; border: 1px solid var(--line);
+  }
+  .topbar .pill-btn {
+    background: var(--ink); color: #fff;
+    border: 0; padding: 9px 14px; border-radius: 999px;
+    cursor: pointer; font-size: 13px;
+  }
+  .topbar .pill-btn.alt { background: var(--paper); color: var(--ink); border: 1px solid var(--line); }
+
+  /* ================= 视图 ================= */
+  .view { display: none; }
+  .view.active { display: block; animation: fade .35s ease; }
+  @keyframes fade { from {opacity:0; transform: translateY(6px);} to {opacity:1;} }
+
+  /* ================= 通用卡片 ================= */
+  .card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    box-shadow: var(--shadow);
+  }
+  .card + .card { margin-top: 16px; }
+  .card .card-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .card .card-head h3 { margin: 0; font-size: 15px; font-weight: 700; }
+  .card .card-head .more { font-size: 12px; color: var(--ink-soft); cursor: pointer; }
+
+  /* ================= 1. 每日美妆 ================= */
+  .beauty-grid {
+    display: grid; gap: 18px;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  }
+  .bcard {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    display: flex; flex-direction: column;
+    transition: transform .25s;
+  }
+  .bcard:hover { transform: translateY(-3px); }
+  .bcard .ph {
+    aspect-ratio: 4/3;
+    display: grid; place-items: center;
+    font-size: 64px;
+    position: relative;
+  }
+  .bcard .flag {
+    position: absolute; top: 12px; left: 12px;
+    background: rgba(255,255,255,.85); backdrop-filter: blur(8px);
+    padding: 4px 10px; border-radius: 999px;
+    font-size: 12px; font-weight: 600;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .bcard .new {
+    position: absolute; top: 12px; right: 12px;
+    background: var(--orange); color: #fff;
+    font-size: 10px; padding: 3px 8px; border-radius: 999px;
+    font-weight: 700; letter-spacing: .04em;
+  }
+  .bcard .body { padding: 14px 16px 16px; }
+  .bcard .nm {
+    display: flex; justify-content: space-between; align-items: baseline;
+    gap: 8px; margin-bottom: 2px;
+  }
+  .bcard .nm .name { font-weight: 700; font-size: 14.5px; line-height: 1.25; }
+  .bcard .nm .nick { color: var(--orange); font-size: 12px; background: var(--orange-bg); padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+  .bcard .price { font-size: 16px; font-weight: 700; color: var(--ink); margin: 8px 0 4px; }
+  .bcard .price small { font-weight: 500; color: var(--ink-soft); font-size: 12px; margin-left: 4px;}
+  .bcard .launch { font-size: 11.5px; color: var(--ink-fade); margin: 2px 0 6px; display: flex; align-items: center; gap: 4px; }
+  .bcard .launch::before { content: '📅'; font-size: 12px; }
+  .bcard ul { list-style: none; padding: 0; margin: 6px 0 0; }
+  .bcard li { font-size: 12.5px; color: var(--ink-soft); padding: 3px 0; line-height: 1.45; }
+  .bcard li b { color: var(--ink); font-weight: 600; }
+  .bcard .slogan {
+    margin-top: 10px; padding-top: 10px;
+    border-top: 1px dashed var(--line);
+    font-size: 12.5px; color: var(--orange); font-style: italic;
+  }
+
+  /* 不同国家 placeholder 色调 */
+  .ph-jp   { background: linear-gradient(135deg, #FCE7E7 0%, #FFD9D9 100%); }
+  .ph-fr   { background: linear-gradient(135deg, #EDE5FF 0%, #DCD0FF 100%); }
+  .ph-kr   { background: linear-gradient(135deg, #FFEED7 0%, #FFD9A8 100%); }
+  .ph-us   { background: linear-gradient(135deg, #DBEFD8 0%, #B8DCB0 100%); }
+  .ph-es   { background: linear-gradient(135deg, #FFF1CF 0%, #F1DDC0 100%); }
+  .ph-de   { background: linear-gradient(135deg, #D5E8F0 0%, #A9D0E3 100%); }
+  .ph-cn   { background: linear-gradient(135deg, #FDE0DC 0%, #F9C5BD 100%); }
+
+  /* ================= 2. 当日热点 ================= */
+  .hot-grid {
+    display: grid; gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+  .hot-cat {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+  }
+  .hot-cat .cat-title {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 10px;
+    font-weight: 700; font-size: 14px;
+  }
+  .hot-cat .cat-title .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+  }
+  .hot-cat ul { list-style: none; padding: 0; margin: 0; }
+  .hot-cat li {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--line);
+    cursor: pointer;
+  }
+  .hot-cat li:last-child { border-bottom: 0; }
+  .hot-cat li:hover .text { color: var(--orange); }
+  .hot-cat .num {
+    flex-shrink: 0; width: 18px; height: 18px;
+    border-radius: 5px; background: var(--bg);
+    color: var(--ink-soft); font-size: 11px; font-weight: 700;
+    display: grid; place-items: center;
+  }
+  .hot-cat li:nth-child(1) .num { background: #C0392B; color: #fff; }
+  .hot-cat li:nth-child(2) .num { background: #E67E22; color: #fff; }
+  .hot-cat li:nth-child(3) .num { background: var(--gold);  color: #fff; }
+  .hot-cat .text {
+    font-size: 13.5px; color: var(--ink); line-height: 1.5;
+    transition: color .15s;
+  }
+  .hot-cat .text small {
+    display: block; color: var(--ink-fade); font-size: 11px; margin-top: 2px;
+  }
+
+  /* ================= 3. 每日新闻 ================= */
+  .news-tabs {
+    display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;
+  }
+  .news-tabs button {
+    background: var(--paper); border: 1px solid var(--line);
+    padding: 7px 14px; border-radius: 999px;
+    font-size: 12.5px; color: var(--ink-soft); cursor: pointer;
+  }
+  .news-tabs button.on {
+    background: var(--ink); color: #fff; border-color: var(--ink);
+  }
+  .news-list { display: flex; flex-direction: column; gap: 10px; }
+  .news-item {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    display: grid; grid-template-columns: 88px 1fr auto;
+    gap: 14px; align-items: center;
+    box-shadow: 0 1px 3px rgba(46,36,18,.04);
+  }
+  .news-item .time { font-size: 12px; color: var(--ink-fade); }
+  .news-item .time b { display: block; font-size: 13.5px; color: var(--ink); }
+  .news-item .ttl { font-size: 13.5px; line-height: 1.5; }
+  .news-item .ttl .tag {
+    display: inline-block; font-size: 10px;
+    padding: 2px 7px; border-radius: 999px;
+    margin-right: 6px; font-weight: 600;
+  }
+  .tag-macro { background: #E7F0FF; color: #2C5BC7; }
+  .tag-ind   { background: #FFF1DA; color: #B7791F; }
+  .tag-co    { background: #E7F7EF; color: #1F7A4A; }
+  .tag-glob  { background: #F2E8FF; color: #6B3FA0; }
+  .tag-fund  { background: #FBE3EC; color: #B03868; }
+  .news-item .impact {
+    font-size: 11.5px; color: var(--ink-soft);
+    max-width: 160px; line-height: 1.45;
+    text-align: right;
+  }
+  .news-item .impact .lbl {
+    font-weight: 700; color: var(--orange); display: block; margin-bottom: 2px;
+  }
+
+  /* ================= 4. 每日复盘 ================= */
+  .market-cards {
+    display: grid; gap: 14px;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    margin-bottom: 18px;
+  }
+  .m-card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    box-shadow: 0 1px 3px rgba(46,36,18,.04);
+  }
+  .m-card .nm { font-size: 12.5px; color: var(--ink-soft); margin-bottom: 4px;}
+  .m-card .val { font-size: 22px; font-weight: 700; letter-spacing: -.01em; }
+  .m-card .chg { font-size: 13px; margin-top: 2px; font-weight: 600; }
+  .up   { color: var(--red); }
+  .down { color: var(--down); }
+  .neutral { color: var(--ink-soft); }
+
+  .review-grid {
+    display: grid; gap: 16px;
+    grid-template-columns: 1fr 1fr;
+  }
+  @media (max-width: 880px) { .review-grid { grid-template-columns: 1fr; } }
+
+  .sector-list { list-style: none; padding: 0; margin: 0; }
+  .sector-list li {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 0;
+    border-bottom: 1px dashed var(--line);
+    font-size: 13px;
+  }
+  .sector-list li:last-child { border-bottom: 0; }
+  .sector-list .nm { display: flex; align-items: center; gap: 8px; }
+  .sector-list .rank {
+    width: 20px; height: 20px; border-radius: 5px;
+    display: grid; place-items: center; font-size: 11px; font-weight: 700;
+    background: var(--bg); color: var(--ink-soft);
+  }
+  .sector-list li:nth-child(1) .rank { background: #C0392B; color: #fff; }
+  .sector-list li:nth-child(2) .rank { background: #E67E22; color: #fff; }
+  .sector-list li:nth-child(3) .rank { background: var(--gold);  color: #fff; }
+
+  .quote {
+    background: var(--orange-bg);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-top: 16px;
+    font-size: 13px;
+    color: #6F3A1E;
+    border-left: 3px solid var(--orange);
+  }
+  .quote b { color: var(--orange); }
+
+  /* ================= 占位视图 ================= */
+  .placeholder {
+    background: var(--paper);
+    border: 1px dashed var(--line);
+    border-radius: var(--radius-lg);
+    padding: 60px 20px;
+    text-align: center;
+    color: var(--ink-soft);
+  }
+  .placeholder .ico { font-size: 48px; margin-bottom: 12px; }
+  .placeholder h3 { margin: 0 0 6px; color: var(--ink); }
+  .placeholder p { margin: 0; font-size: 13px; }
+
+
+  /* ================= 5. 小红书爆款文库 ================= */
+  .xhs-grid {
+    display: grid; gap: 18px;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  }
+  .xhs-card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .xhs-card .xhs-top {
+    padding: 16px 18px 0;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .xhs-card .xhs-avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: linear-gradient(135deg, #FF6B6B 0%, #FECA57 100%);
+    color: #fff; font-weight: 800; display: grid; place-items: center;
+    font-size: 14px;
+  }
+  .xhs-card .xhs-user { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .xhs-card .xhs-user small { display: block; font-weight: 400; color: var(--ink-fade); font-size: 11px; }
+  .xhs-card .xhs-body { padding: 12px 18px 16px; }
+  .xhs-card .xhs-title {
+    font-size: 16px; font-weight: 700; line-height: 1.45;
+    margin-bottom: 10px; color: #1A1A1A;
+  }
+  .xhs-card .xhs-text {
+    font-size: 13px; line-height: 1.8; color: var(--ink);
+    max-height: 280px; overflow-y: auto;
+  }
+  .xhs-card .xhs-text b { color: var(--orange); font-weight: 600; }
+  .xhs-card .xhs-text .subhead {
+    display: block; font-weight: 700; font-size: 13.5px;
+    margin-top: 10px; margin-bottom: 4px; color: var(--ink);
+  }
+  .xhs-card .xhs-text em { font-style: normal; background: #FFF3CD; padding: 1px 4px; border-radius: 3px; }
+  .xhs-card .xhs-tags {
+    padding: 10px 18px 14px;
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .xhs-card .xhs-tags span {
+    background: var(--bg);
+    color: var(--orange);
+    font-size: 11px; padding: 3px 9px; border-radius: 999px;
+    font-weight: 500;
+  }
+  .xhs-card .xhs-act {
+    border-top: 1px solid var(--line);
+    padding: 12px 18px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .xhs-card .xhs-act .stats { font-size: 12px; color: var(--ink-fade); display: flex; gap: 14px; }
+  .xhs-card .copy-btn {
+    background: var(--orange); color: #fff;
+    border: none; padding: 7px 16px; border-radius: 999px;
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    transition: background .18s;
+  }
+  .xhs-card .copy-btn:hover { background: #C4603D; }
+  .xhs-card .copy-btn.copied { background: var(--down); }
+
+  /* ---- 图文种草卡片 ---- */
+  .xhs-visual { border: 2px dashed var(--orange) !important; }
+  .xhs-visual .xhs-img-area {
+    margin: 0 18px; padding: 40px 20px;
+    background: linear-gradient(135deg, #FFF5F0 0%, #FDE8DC 100%);
+    border-radius: 12px; text-align: center;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+  }
+  .xhs-visual .xhs-img-area .img-icon {
+    font-size: 52px; line-height: 1;
+  }
+  .xhs-visual .xhs-img-area .img-label {
+    font-size: 13px; font-weight: 700; color: var(--orange);
+    background: #fff; padding: 4px 14px; border-radius: 999px;
+  }
+  .xhs-visual .xhs-img-area .img-tip {
+    font-size: 11px; color: var(--ink-fade);
+  }
+  .xhs-visual .xhs-body {
+    padding: 14px 18px 12px;
+  }
+  .xhs-visual .xhs-body .xhs-copy {
+    font-size: 13px; line-height: 1.8; color: var(--ink);
+    background: var(--bg); border-radius: 8px;
+    padding: 10px 12px; margin-top: 8px;
+    border-left: 3px solid var(--orange);
+  }
+  .xhs-visual .xhs-body .xhs-copy b { color: var(--orange); }
+
+  @media (max-width: 760px) {
+    .xhs-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ================= 6. 抖音宠物号 ================= */
+  .douyin-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .douyin-layout .card { margin: 0; }
+
+  /* 任务清单 */
+  .task-group { margin-bottom: 16px; }
+  .task-group-title {
+    font-size: 14px; font-weight: 700; color: var(--ink);
+    padding-bottom: 8px; margin-bottom: 8px;
+    border-bottom: 2px solid var(--orange-bg);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .task-group-title .badge-mini {
+    font-size: 11px; background: var(--orange-bg); color: var(--orange);
+    padding: 2px 8px; border-radius: 999px; font-weight: 600;
+  }
+  .task-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 9px 0; border-bottom: 1px solid #f0ebe0;
+    font-size: 13.5px; line-height: 1.6;
+  }
+  .task-item:last-child { border-bottom: none; }
+  .task-item input[type=checkbox] {
+    margin-top: 2px; width: 18px; height: 18px; accent-color: var(--orange);
+    flex-shrink: 0; cursor: pointer;
+  }
+  .task-item .task-label { flex: 1; }
+  .task-item .task-label small { color: var(--ink-soft); font-size: 12px; display: block; margin-top: 2px; }
+  .task-item.done .task-label { text-decoration: line-through; color: var(--ink-soft); }
+  .task-item.done .task-label small { text-decoration: line-through; }
+  .task-freq {
+    font-size: 11px; background: #eee; color: #888;
+    padding: 1px 7px; border-radius: 999px; flex-shrink: 0; margin-top: 2px;
+  }
+
+  /* 剪辑器 */
+  .editor-area {
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .editor-video-wrap {
+    width: 100%; background: #000; border-radius: 14px; overflow: hidden;
+    position: relative; min-height: 200px; display: flex;
+    align-items: center; justify-content: center;
+  }
+  .editor-video-wrap video { width: 100%; max-height: 380px; display: block; }
+  .editor-video-wrap .placeholder {
+    color: #666; font-size: 14px; text-align: center; padding: 40px;
+  }
+  .editor-upload {
+    display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+  }
+  .editor-upload label {
+    background: var(--orange); color: #fff; padding: 10px 20px;
+    border-radius: 12px; font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: background .18s; display: inline-block;
+  }
+  .editor-upload label:hover { background: #C4603D; }
+  .editor-upload input[type=file] { display: none; }
+  .editor-upload .file-name {
+    font-size: 12px; color: var(--ink-soft); max-width: 200px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .trim-controls {
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .trim-row {
+    display: flex; align-items: center; gap: 10px; font-size: 13px;
+  }
+  .trim-row label { font-weight: 600; min-width: 42px; color: var(--ink); }
+  .trim-row input[type=range] { flex: 1; accent-color: var(--orange); }
+  .trim-row .time-val { font-size: 12px; color: var(--ink-soft); min-width: 45px; text-align: right; }
+  .overlay-row {
+    display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+  }
+  .overlay-row input[type=text] {
+    flex: 1; min-width: 160px; padding: 8px 12px;
+    border: 1px solid #e0d8c8; border-radius: 10px; font-size: 13px;
+    background: #fff;
+  }
+  .overlay-row select {
+    padding: 8px 12px; border: 1px solid #e0d8c8; border-radius: 10px;
+    font-size: 13px; background: #fff;
+  }
+  .editor-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+  .editor-btns button {
+    padding: 10px 22px; border: none; border-radius: 12px;
+    font-size: 13px; font-weight: 600; cursor: pointer; transition: background .18s;
+  }
+  .btn-preview { background: #fff; border: 2px solid var(--orange); color: var(--orange); }
+  .btn-preview:hover { background: var(--orange-bg); }
+  .btn-export { background: var(--orange); color: #fff; }
+  .btn-export:hover { background: #C4603D; }
+  .btn-export:disabled { background: #ccc; cursor: not-allowed; }
+  .editor-status {
+    font-size: 12px; color: var(--ink-soft); padding: 4px 0;
+  }
+  .editor-status.success { color: var(--up); font-weight: 600; }
+
+  @media (max-width: 900px) {
+    .douyin-layout { grid-template-columns: 1fr; }
+  }
+
+  /* ================= 相机学习模块 ================= */
+  .cam-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .cam-layout .cam-full { grid-column: 1 / -1; }
+  .cam-card {
+    background: #fff; border-radius: 14px; padding: 20px 22px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.04); border: 1px solid #f0ebe0;
+  }
+  .cam-card h3 { font-size: 16px; margin: 0 0 14px; display: flex; align-items: center; gap: 8px; color: var(--ink); }
+  .cam-card h3 .cam-icon { font-size: 20px; }
+  /* 相机速查 */
+  .cam-specs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; font-size: 13px; }
+  .cam-specs .spec { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #f0ebe0; }
+  .cam-specs .spec .lbl { color: var(--ink-fade); }
+  .cam-specs .spec .val { font-weight: 600; color: var(--ink); }
+  /* 镜头装备 */
+  .lens-item { padding: 12px 0; border-bottom: 1px solid #f0ebe0; }
+  .lens-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .lens-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  .lens-name { font-size: 13.5px; font-weight: 700; color: var(--ink); }
+  .lens-tag { font-size: 11px; padding: 2px 9px; border-radius: 999px; font-weight: 600; white-space: nowrap; }
+  .tag-daily { background: #F0F5FF; color: #4A7FB5; }
+  .tag-portrait { background: #FFF0F0; color: #C0392B; }
+  .lens-tip { font-size: 12px; color: var(--ink-fade); margin-top: 8px; padding: 6px 10px; background: #FAF6EF; border-radius: 8px; line-height: 1.6; }
+  /* 配方卡片 */
+  .recipe-card {
+    background: #fff; border-radius: 14px; padding: 18px 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.04); border-left: 4px solid var(--orange);
+    margin-bottom: 14px;
+  }
+  .recipe-card h4 { margin: 0 0 6px; font-size: 15px; color: var(--ink); display: flex; align-items: center; gap: 6px; }
+  .recipe-card .recipe-tag { font-size: 11px; background: #FFF5F0; color: var(--orange); padding: 2px 8px; border-radius: 999px; font-weight: 600; }
+  .recipe-card .recipe-scene { font-size: 12px; color: var(--ink-fade); margin-bottom: 10px; }
+  .recipe-card .recipe-params { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 12px; font-size: 12.5px; }
+  .recipe-card .recipe-params .rp { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px dotted #f5efe5; }
+  .recipe-card .recipe-params .rp .k { color: var(--ink-fade); }
+  .recipe-card .recipe-params .rp .v { font-weight: 600; color: var(--ink); }
+  /* 视频教程 */
+  .cam-video-row { display: flex; flex-wrap: wrap; gap: 12px; }
+  .cam-video-item {
+    flex: 1; min-width: 200px; background: #fff; border-radius: 12px;
+    padding: 14px 16px; box-shadow: 0 1px 4px rgba(0,0,0,.04);
+    border: 1px solid #f0ebe0; display: flex; align-items: center; gap: 12px;
+    cursor: pointer; text-decoration: none; color: var(--ink); transition: box-shadow .2s;
+  }
+  .cam-video-item:hover { box-shadow: 0 2px 10px rgba(0,0,0,.08); }
+  .cam-video-item .play-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--orange); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .cam-video-item .cam-video-info { font-size: 13px; line-height: 1.5; }
+  .cam-video-item .cam-video-info .vt { font-weight: 600; }
+  .cam-video-item .cam-video-info .vs { font-size: 11px; color: var(--ink-fade); }
+  /* 技巧提示 */
+  .cam-tips { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .cam-tip {
+    background: #FFFCF8; border: 1px solid #f5efe5; border-radius: 10px;
+    padding: 12px 14px; font-size: 13px; line-height: 1.7;
+  }
+  .cam-tip b { color: var(--orange); }
+  /* 相机任务 */
+  .cam-tasks .task-group { margin-bottom: 16px; }
+  .cam-tasks .task-group-title { font-size: 14px; font-weight: 700; color: var(--orange); margin-bottom: 8px; }
+  .cam-tasks .task-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f8f3ea; }
+  .cam-tasks .task-item input[type=checkbox] { margin-top: 3px; accent-color: var(--orange); transform: scale(1.1); }
+  .cam-tasks .task-label { font-size: 13.5px; line-height: 1.6; color: var(--ink); }
+  .cam-tasks .task-label small { display: block; font-size: 11.5px; color: var(--ink-fade); margin-top: 2px; }
+  .cam-tasks .task-label b { color: var(--orange); }
+  .cam-week-tag { display: inline-block; background: var(--orange); color: #fff; font-size: 11px; padding: 2px 10px; border-radius: 999px; font-weight: 700; margin-left: 6px; }
+  @media (max-width: 768px) {
+    .cam-layout { grid-template-columns: 1fr; }
+    .cam-tips { grid-template-columns: 1fr; }
+    .cam-specs { grid-template-columns: 1fr; }
+  }
+
+  /* ================= 移动端 ================= */
+  .menu-btn { display: none; }
+  .scrim { display: none; }
+
+  @media (max-width: 760px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar {
+      position: fixed; top: 0; left: 0; bottom: 0;
+      width: 275px; z-index: 30; padding-top: env(safe-area-inset-top, 0);
+      transform: translateX(-100%);
+      transition: transform .25s cubic-bezier(.4,0,.2,1);
+      box-shadow: 6px 0 30px rgba(0,0,0,.12);
+    }
+    .sidebar.open { transform: translateX(0); }
+    .scrim {
+      position: fixed; inset: 0; background: rgba(0,0,0,.32); z-index: 25;
+    }
+    .scrim.on { display: block; animation: fadeIn .2s; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .menu-btn {
+      display: grid; place-items: center;
+      width: 40px; height: 40px; border-radius: 12px;
+      background: var(--paper); border: 1px solid var(--line); cursor: pointer;
+      font-size: 20px;
+    }
+    .main {
+      padding: 14px 12px 80px;
+      padding-top: env(safe-area-inset-top, 14px);
+    }
+    .topbar { gap: 10px; flex-wrap: wrap; }
+    .topbar h1 { font-size: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 55vw; }
+    .topbar .date { font-size: 12px; }
+    .topbar .pill-btn { font-size: 11px; padding: 6px 14px; }
+    .news-item { grid-template-columns: 1fr; gap: 4px; }
+    .news-item .impact { text-align: left; max-width: 100%; }
+    .bcard .nm { flex-direction: column; align-items: flex-start; }
+    .bcard .ph { min-height: 120px; font-size: 36px; }
+    .market-cards { grid-template-columns: repeat(2, 1fr); }
+    .review-grid { grid-template-columns: 1fr; }
+    .douyin-layout { grid-template-columns: 1fr; }
+    .xhs-grid { grid-template-columns: 1fr; }
+    .beauty-grid { grid-template-columns: 1fr; }
+    .hot-grid { grid-template-columns: 1fr; }
+    /* 更大点击区域 */
+    .nav-item { padding: 12px 16px; min-height: 44px; }
+    .task-item { padding: 12px 0; }
+    .editor-upload label { width: 100%; text-align: center; padding: 14px; }
+    .editor-btns { flex-direction: column; }
+    .editor-btns button { width: 100%; padding: 14px; }
+    .trim-row { font-size: 12px; }
+    .sidebar .brand { padding: 16px 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ===================== 侧边栏 ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">W</div>
+      <div>
+        <div class="name">三好个人工作台</div>
+        <div class="sub">每日推送 · Home Screen</div>
+      </div>
+    </div>
+
+    <div class="group-title">今日推送</div>
+    <ul class="nav" id="nav">
+      <li class="nav-item active" data-view="view-beauty"><span class="ico">💄</span>每日美妆<span class="badge">NEW</span></li>
+      <li class="nav-item" data-view="view-hot"><span class="ico">🔥</span>当日热点<span class="badge">NEW</span></li>
+      <li class="nav-item" data-view="view-news"><span class="ico">📰</span>每日新闻<span class="badge">NEW</span></li>
+      <li class="nav-item" data-view="view-review"><span class="ico">📈</span>每日复盘<span class="badge">NEW</span></li>
+      <li class="nav-item" data-view="view-xhs"><span class="ico">📕</span>小红书文库<span class="badge">NEW</span></li>
+      <li class="nav-item" data-view="view-douyin"><span class="ico">🐾</span>抖音宠物号<span class="badge">NEW</span></li>
+      <li class="nav-item" data-view="view-camera"><span class="ico">📷</span>相机学习<span class="badge">NEW</span></li>
+    </ul>
+
+    <div class="sidebar-foot">
+      <b>更新节奏</b><br>
+      美妆 / 热点 / 新闻 · 每日早间<BR>
+      复盘 · 每日盘后
+    </div>
+  </aside>
+
+  <div class="scrim" id="scrim"></div>
+
+  <!-- ===================== 主区 ===================== -->
+  <main class="main" id="main">
+
+    <div class="topbar">
+      <button class="menu-btn" id="menuBtn">☰</button>
+      <h1 id="pageTitle">每日美妆 · 全球新品速递</h1>
+      <div class="date" id="dateText">—</div>
+      <button class="pill-btn alt" id="refreshBtn">刷新</button>
+    </div>
+
+    <section class="view active" id="view-beauty">
+      <div class="beauty-grid">
+
+        <article class="bcard">
+          <div class="ph ph-kr">
+            <span class="flag">🇰🇷 韩国</span><span class="new">肌底精华</span>🌿
+          </div>
+          <div class="body">
+            <div class="nm">
+              <span class="name">Sulwhasoo First Care Activating Serum VI</span>
+              <span class="nick">雪花秀 第六代润致焕活肌底精华</span>
+            </div>
+            <div class="price">¥ 860 <small>KRW 140,000 · 90ml</small></div>
+            <div class="launch">2025年8月 · 韩国首发，@cosme 2025H2 综合第3名</div>
+            <ul>
+              <li><b>规格：</b>90ml · 玻璃按压瓶</li>
+              <li><b>销售渠道：</b>雪花秀官网、Tmall 旗舰店、免税店、Olive Young</li>
+              <li><b>核心成分：</b>第五代滋盈肌活因子、芍药、莲、玉竹、百合</li>
+              <li><b>核心卖点：</b>修护肌底 / 提亮肤色 / 抗初老 / 促进后续吸收 / 东方草本香</li>
+            </ul>
+            <div class="slogan">"护肤第一步，先把底子养回来"</div>
+          </div>
+        </article>
+
+        <article class="bcard">
+          <div class="ph ph-fr">
+            <span class="flag">🇫🇷 法国</span><span class="new">美白面霜</span>🍇
+          </div>
+          <div class="body">
+            <div class="nm">
+              <span class="name">Caudalie Vinoperfect Brightening Glycolic Night Cream</span>
+              <span class="nick">欧缇丽 淡斑亮白夜间面霜</span>
+            </div>
+            <div class="price">¥ 320 <small>EUR 39.00 · 50ml</small></div>
+            <div class="launch">2026年3月 · 欧洲首发，敏感肌可用</div>
+            <ul>
+              <li><b>规格：</b>50ml · 磨砂玻璃瓶</li>
+              <li><b>销售渠道：</b>欧缇丽官网、Sephora、Tmall 海外旗舰店、药妆店</li>
+              <li><b>核心成分：</b>葡萄蔓威尼菲霖、甘醇酸、烟酰胺、乳木果油</li>
+              <li><b>核心卖点：</b>夜间淡斑 / 温和代谢角质 / 提亮肤色 / 天然植萃</li>
+            </ul>
+            <div class="slogan">"睡着睡着，斑就淡了"</div>
+          </div>
+        </article>
+
+        <article class="bcard">
+          <div class="ph ph-jp">
+            <span class="flag">🇯🇵 日本</span><span class="new">淡斑精华</span>🌸
+          </div>
+          <div class="body">
+            <div class="nm">
+              <span class="name">Albion Excia AL Whitening Intensive Spots</span>
+              <span class="nick">澳尔滨 雅思臻白淡斑精华</span>
+            </div>
+            <div class="price">¥ 680 <small>JPY 12,000 · 40ml</small></div>
+            <div class="launch">2026年2月 · 日本先行，专柜限定发售</div>
+            <ul>
+              <li><b>规格：</b>40ml · 铝管按压</li>
+              <li><b>销售渠道：</b>澳尔滨专柜、@cosme、Tmall 海外旗舰店、伊势丹</li>
+              <li><b>核心成分：</b>曲酸、VC 衍生物、和汉植物提取物</li>
+              <li><b>核心卖点：</b>局部淡斑 / 抑制黑色素 / 日系美白标杆 / 肤感水润</li>
+            </ul>
+            <div class="slogan">"斑点不等人，但澳尔滨等得起"</div>
+          </div>
+        </article>
+
+        <article class="bcard">
+          <div class="ph ph-us">
+            <span class="flag">🇺🇸 美国</span><span class="new">水光腮红</span>🍑
+          </div>
+          <div class="body">
+            <div class="nm">
+              <span class="name">Saie Dew Blush 2026 S/S New Shades</span>
+              <span class="nick">Saie 水光液体腮红 新色</span>
+            </div>
+            <div class="price">¥ 185 <small>USD 25.00 · 12ml</small></div>
+            <div class="launch">2026年4月 · 美国 Sephora 首发，纯净美妆断货王</div>
+            <ul>
+              <li><b>规格：</b>12ml · 软管按压</li>
+              <li><b>销售渠道：</b>Sephora、Saie 官网、小红书买手店</li>
+              <li><b>核心成分：</b>透明质酸、植物角鲨烷、无香精</li>
+              <li><b>核心卖点：</b>水光感腮红 / 纯净美妆 / 黄皮显白 / 新手友好 / 单支成妆</li>
+            </ul>
+            <div class="slogan">"元气感不是刷出来的，是水光透出来的"</div>
+          </div>
+        </article>
+
+        <article class="bcard">
+          <div class="ph ph-de">
+            <span class="flag">🇩🇪 德国</span><span class="new">抗皱精华</span>🧬
+          </div>
+          <div class="body">
+            <div class="nm">
+              <span class="name">Eucerin Hyaluron-Filler + Elasticity 3D Serum</span>
+              <span class="nick">优色林 3D 抗皱紧致精华</span>
+            </div>
+            <div class="price">¥ 289 <small>EUR 34.90 · 30ml</small></div>
+            <div class="launch">2026年5月 · 德国首发，拜尔斯道夫集团新作</div>
+            <ul>
+              <li><b>规格：</b>30ml · 双管真空瓶</li>
+              <li><b>销售渠道：</b>Eucerin 官网、DM、Rossmann、Tmall 海外旗舰店、京东</li>
+              <li><b>核心成分：</b>透明质酸、白藜芦醇、甘草查尔酮 A</li>
+              <li><b>核心卖点：</b>抗皱 + 紧致 + 丰盈 / 拜尔斯道夫出品 / 敏感肌可用</li>
+            </ul>
+            <div class="slogan">"不是水光针，是3D抗皱精华"</div>
+          </div>
+        </article>
+
+        <article class="bcard">
+          <div class="ph ph-cn">
+            <span class="flag">🇨🇳 中国</span><span class="new">蓝铜胜肽</span>🔵
+          </div>
+          <div class="body">
+            <div class="nm">
+              <span class="name">夸迪 5D 玻尿酸轻龄蕴能次抛精华</span>
+              <span class="nick">夸迪 蓝铜胜肽次抛 2.0</span>
+            </div>
+            <div class="price">¥ 338 <small>1.5ml×30支 · 官方旗舰店</small></div>
+            <div class="launch">2026年6月 · 全新升级上市，华熙生物专研</div>
+            <ul>
+              <li><b>规格：</b>1.5ml×30支 · 医用级 BFS 次抛</li>
+              <li><b>销售渠道：</b>夸迪官方旗舰店、李佳琦直播间、三甲医院合作药房</li>
+              <li><b>核心成分：</b>蓝铜胜肽、5D 玻尿酸、依克多因</li>
+              <li><b>核心卖点：</b>修护屏障 / 紧致轮廓 / 医美术后可用 / 华熙生物原料背书</li>
+            </ul>
+            <div class="slogan">"把蓝铜胜肽装进次抛，一支稳住年轻感"</div>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ============== 2. 当日热点 ============== -->
+    <section class="view" id="view-hot">
+      <div class="hot-grid">
+
+        <div class="hot-cat">
+          <div class="cat-title"><span class="dot" style="background:#C0392B"></span>科技 / AI</div>
+          <ul>
+            <li><span class="num">1</span><span class="text">SpaceX 股价大涨 15.83%，将自建卫星工厂引爆市场<small>热度 9.1亿</small></span></li>
+            <li><span class="num">2</span><span class="text">宇树科技科创板申购开启，人形机器人产业链再升温<small>热度 7.8亿</small></span></li>
+            <li><span class="num">3</span><span class="text">Qwen3.8-Max 与 DeepSeek V4-Flash 上线，开源模型进入白菜价时代<small>热度 5.4亿</small></span></li>
+            <li><span class="num">4</span><span class="text">英伟达涨 2.27%，算力芯片需求依旧强劲<small>热度 3.2亿</small></span></li>
+          </ul>
+        </div>
+
+        <div class="hot-cat">
+          <div class="cat-title"><span class="dot" style="background:#E67E22"></span>财经 / 资本</div>
+          <ul>
+            <li><span class="num">1</span><span class="text">标普 500 创历史新高，美股三大指数本周均录得较大涨幅<small>热度 8.3亿</small></span></li>
+            <li><span class="num">2</span><span class="text">A股 8月7日放量反弹，沪指涨 1.02% 收于 3940.04<small>热度 7.1亿</small></span></li>
+            <li><span class="num">3</span><span class="text">宁德时代中期分红 61.8 亿，每 10 股派 14.11 元<small>热度 4.6亿</small></span></li>
+            <li><span class="num">4</span><span class="text">股票私募仓位升至近 8 成，连续 4 周加仓<small>热度 3.3亿</small></span></li>
+          </ul>
+        </div>
+
+        <div class="hot-cat">
+          <div class="cat-title"><span class="dot" style="background:var(--gold)"></span>社会 / 民生</div>
+          <ul>
+            <li><span class="num">1</span><span class="text">8月8日全民健身日，全国多地开展免费运动场馆开放活动<small>热度 6.2亿</small></span></li>
+            <li><span class="num">2</span><span class="text">暑期文旅 + 免税消费火爆，海南前7月离岛免税增长17%<small>热度 4.5亿</small></span></li>
+            <li><span class="num">3</span><span class="text">多地发布高温红色预警，户外劳动者权益保障引关注<small>热度 3.8亿</small></span></li>
+            <li><span class="num">4</span><span class="text">北京前7月离境退税创新高，入境游带火"北京购"<small>热度 2.4亿</small></span></li>
+          </ul>
+        </div>
+
+        <div class="hot-cat">
+          <div class="cat-title"><span class="dot" style="background:var(--pink)"></span>娱乐 / 文化</div>
+          <ul>
+            <li><span class="num">1</span><span class="text">悬疑剧《人鱼》腾讯视频热度破 21000，登顶热搜榜首<small>热度 6.8亿</small></span></li>
+            <li><span class="num">2</span><span class="text">2026暑期档票房破 230 亿，8月多部新片持续发力<small>热度 4.9亿</small></span></li>
+            <li><span class="num">3</span><span class="text">腾讯视频发布 2026 综艺片单，《现在就出发4》等官宣<small>热度 3.1亿</small></span></li>
+            <li><span class="num">4</span><span class="text">王源长沙演唱会今晚开唱，多地实行交通管制<small>热度 2.7亿</small></span></li>
+          </ul>
+        </div>
+
+        <div class="hot-cat">
+          <div class="cat-title"><span class="dot" style="background:#5B8C5A"></span>生活 / 健康</div>
+          <ul>
+            <li><span class="num">1</span><span class="text">国产 HPV 疫苗降价至百元以内，接种意愿显著提升<small>热度 5.5亿</small></span></li>
+            <li><span class="num">2</span><span class="text">秋季养生茶饮走红，"药食同源"话题阅读量破亿<small>热度 3.2亿</small></span></li>
+            <li><span class="num">3</span><span class="text">防晒喷雾安全使用提醒：避免直喷面部、远离火源<small>热度 2.6亿</small></span></li>
+            <li><span class="num">4</span><span class="text">高温天"空调病"就诊增多，医生建议室温 26℃ 为宜<small>热度 1.9亿</small></span></li>
+          </ul>
+        </div>
+
+        <div class="hot-cat">
+          <div class="cat-title"><span class="dot" style="background:#2C5BC7"></span>国际 / 地缘</div>
+          <ul>
+            <li><span class="num">1</span><span class="text">霍尔木兹海峡通航谈判持续，伊朗与阿曼密集磋商<small>热度 7.4亿</small></span></li>
+            <li><span class="num">2</span><span class="text">美国 7 月非农就业意外下滑，美联储降息预期升温<small>热度 6.6亿</small></span></li>
+            <li><span class="num">3</span><span class="text">中东局势缓和迹象推动油价回落，全球航运成本下降<small>热度 3.9亿</small></span></li>
+            <li><span class="num">4</span><span class="text">欧洲央行维持利率不变，欧元区通胀压力仍存<small>热度 2.1亿</small></span></li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============== 3. 每日新闻（股市/基金分析用） ============== -->
+    <section class="view" id="view-news">
+      <div class="news-tabs" id="newsTabs">
+        <button class="on" data-cat="all">全部</button>
+        <button data-cat="macro">宏观 / 政策</button>
+        <button data-cat="ind">行业</button>
+        <button data-cat="co">公司</button>
+        <button data-cat="glob">海外</button>
+        <button data-cat="fund">基金</button>
+      </div>
+
+      <div class="news-list" id="newsList"></div>
+    </section>
+
+    <!-- ============== 4. 每日复盘（股市/基金波动） ============== -->
+    <section class="view" id="view-review">
+
+      <div class="card">
+        <div class="card-head"><h3>大盘指数 · 收盘</h3><span class="more">2026-08-08</span></div>
+        <div class="market-cards">
+          <div class="m-card">
+            <div class="nm">上证指数</div>
+            <div class="val">3,940.04</div>
+            <div class="chg up">+1.02% · +39.69</div>
+          </div>
+          <div class="m-card">
+            <div class="nm">深证成指</div>
+            <div class="val">14,311.01</div>
+            <div class="chg up">+1.42% · +200.89</div>
+          </div>
+          <div class="m-card">
+            <div class="nm">创业板指</div>
+            <div class="val">3,563.12</div>
+            <div class="chg up">+1.35% · +47.56</div>
+          </div>
+          <div class="m-card">
+            <div class="nm">恒生指数</div>
+            <div class="val">25,668.03</div>
+            <div class="chg up">+0.54% · +137.75</div>
+          </div>
+          <div class="m-card">
+            <div class="nm">道琼斯</div>
+            <div class="val">54,036.93</div>
+            <div class="chg up">+0.28% · +151.83</div>
+          </div>
+          <div class="m-card">
+            <div class="nm">标普 500</div>
+            <div class="val">7,757.64</div>
+            <div class="chg up">+0.62% · +47.68</div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:8px;font-size:13px;color:var(--ink-soft);">
+          <div>📊 <b style="color:var(--ink)">沪深成交</b> 约 2.66 万亿　<span class="up">放量 1356 亿</span></div>
+          <div>💹 <b style="color:var(--ink)">热门方向</b> <span class="up">CRO · 元件 · 稀土</span></div>
+          <div>💵 <b style="color:var(--ink)">涨停股</b> 云南锗业 / 有研新材 / 生益科技</div>
+        </div>
+      </div>
+
+      <div class="review-grid">
+
+        <div class="card">
+          <div class="card-head"><h3>🔥 涨幅前列</h3><span class="more">周五收盘</span></div>
+          <ul class="sector-list">
+            <li><span class="nm"><span class="rank">1</span>医疗服务</span><span class="up">+8.40%</span></li>
+            <li><span class="nm"><span class="rank">2</span>玻璃玻纤</span><span class="up">+7.11%</span></li>
+            <li><span class="nm"><span class="rank">3</span>元件</span><span class="up">+6.74%</span></li>
+            <li><span class="nm"><span class="rank">4</span>生物制品</span><span class="up">+6.06%</span></li>
+            <li><span class="nm"><span class="rank">5</span>化学制药</span><span class="up">+5.21%</span></li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>📉 跌幅前列</h3><span class="more">周五收盘</span></div>
+          <ul class="sector-list">
+            <li><span class="nm"><span class="rank">1</span>家用电器</span><span class="down">-0.86%</span></li>
+            <li><span class="nm"><span class="rank">2</span>银行</span><span class="down">-0.65%</span></li>
+            <li><span class="nm"><span class="rank">3</span>交通运输</span><span class="down">-0.64%</span></li>
+            <li><span class="nm"><span class="rank">4</span>计算机</span><span class="down">-0.60%</span></li>
+            <li><span class="nm"><span class="rank">5</span>商贸零售</span><span class="down">-0.42%</span></li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>📦 热门个股</h3><span class="more">热搜榜</span></div>
+          <ul class="sector-list">
+            <li><span class="nm">云南锗业</span><span class="up">+10.00% 涨停</span></li>
+            <li><span class="nm">有研新材</span><span class="up">+10.00% 涨停</span></li>
+            <li><span class="nm">生益科技</span><span class="up">+10.00% 涨停</span></li>
+            <li><span class="nm">中国稀土</span><span class="up">+10.00% 涨停</span></li>
+            <li><span class="nm">兆易创新</span><span class="up">+8.32%</span></li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>🌐 资金 / 商品</h3><span class="more">实时</span></div>
+          <ul class="sector-list">
+            <li><span class="nm">人民币兑美元</span><span>7.14　<span class="neutral">基本持平</span></span></li>
+            <li><span class="nm">国际金价（盎司）</span><span>$4,371.53　<span class="up">+3.0%</span></span></li>
+            <li><span class="nm">北向资金</span><span>净流入约 85 亿　<span class="up">积极</span></span></li>
+            <li><span class="nm">原油期货</span><span>回落　<span class="down">-1.2%</span></span></li>
+            <li><span class="nm">私募仓位</span><span>近 8 成　<span class="up">连续4周加仓</span></span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="quote">
+        <b>📌 今日复盘要点：</b>
+        周五A股三大指数全线收红，创业板指领涨后沪指紧随其后；CRO、元件、稀土/小金属成为最强主线，
+        药明康德带动医药板块估值修复，有研新材、云南锗业等涨停。海外方面，美国7月非农意外走弱推升降息预期，
+        美股道指、标普500、纳指齐涨，标普500再创收盘新高。<b>关注方向</b>：CRO持续性、元件高切低、稀土供给扰动。
+      </div>
+    </section>
+
+     <!-- ============== 5. 小红书爆款文库 ============== -->
+    <section class="view" id="view-xhs">
+      <div class="xhs-grid">
+
+        <!-- === 图文种草卡：雪花秀肌底精华 === -->
+        <article class="xhs-card xhs-visual">
+          <div class="xhs-img-area">
+            <div class="img-icon">🌿✨</div>
+            <div class="img-label">雪花秀 第六代润致焕活肌底精华 · 90ml</div>
+            <div class="img-tip">📸 建议配图：棕色玻璃瓶 + 精华拉丝质地，暖光侧逆光拍摄</div>
+          </div>
+          <div class="xhs-body">
+            <div class="xhs-title">🌿 雪花秀第六代肌底精华｜护肤第一步，先把底子养回来</div>
+            <div class="xhs-copy">
+              <b>【产品一句话】</b>韩国高端草本护肤代表作，第五代滋盈肌活因子打底，吸收快、肤感润。<br>
+              <b>【我的感受】</b>用完它再涂水乳，后续产品吸收明显变快，熬夜后脸不那么暗沉。<br>
+              <b>【怎么用】</b>洁面后第一步，按压2-3泵掌心搓热后按压上脸。<br>
+              <b>【价格】</b>专柜860/90ml，免税店套装更划算。
+            </div>
+          </div>
+          <div class="xhs-tags"><span>#雪花秀</span><span>#肌底精华</span><span>#抗初老</span><span>#韩系护肤</span></div>
+          <button class="copy-btn">📋 一键复制</button>
+        </article>
+
+        <!-- === 纯文字爆款文章 === -->
+        <article class="xhs-card">
+          <div class="xhs-title">🔥 初秋护肤别乱叠！三好的"3+1"精简公式</div>
+          <div class="xhs-text">
+            <p>我是三好，立秋刚过很多人开始疯狂叠加产品。其实换季越简单越稳。</p>
+            <p><b>我的3+1公式：</b></p>
+            <p><b>基础3步：</b>洁面 → 肌底精华（如雪花秀第六代）→ 保湿面霜（如欧缇丽夜间面霜）。</p>
+            <p><b>加1步：</b>根据需求选功效精华：淡斑用澳尔滨、抗皱用优色林3D、修护用夸迪蓝铜胜肽次抛。</p>
+            <p>不要同时开3瓶功效精华，皮肤真的会"消化不良"。</p>
+          </div>
+          <div class="xhs-tags"><span>#精简护肤</span><span>#换季护肤</span><span>#肌底精华</span><span>#功效护肤</span></div>
+          <button class="copy-btn">📋 一键复制</button>
+        </article>
+
+        <!-- === 图文种草卡：欧缇丽夜间面霜 === -->
+        <article class="xhs-card xhs-visual">
+          <div class="xhs-img-area">
+            <div class="img-icon">🍇🌙</div>
+            <div class="img-label">欧缇丽 淡斑亮白夜间面霜 · 50ml</div>
+            <div class="img-tip">📸 建议配图：磨砂玻璃瓶 + 紫色葡萄元素，暗调背景突出"夜间"氛围</div>
+          </div>
+          <div class="xhs-body">
+            <div class="xhs-title">🍇 睡着睡着斑就淡了？欧缇丽这瓶面霜有点东西</div>
+            <div class="xhs-copy">
+              <b>【产品一句话】</b>法国药妆葡萄蔓淡斑科技，夜间温和代谢角质，敏感肌也能用。<br>
+              <b>【我的感受】</b>用了两周，嘴角暗沉有变浅，早晨洗脸后脸很软。<br>
+              <b>【关键用法】</b>晚上最后一步，薄涂全脸，色斑处可轻轻叠加。<br>
+              <b>【价格】</b>320/50ml，性价比在法国药妆里很能打。
+            </div>
+          </div>
+          <div class="xhs-tags"><span>#欧缇丽</span><span>#淡斑</span><span>#夜间面霜</span><span>#敏感肌</span></div>
+          <button class="copy-btn">📋 一键复制</button>
+        </article>
+
+        <!-- === 纯文字爆款文章 === -->
+        <article class="xhs-card">
+          <div class="xhs-title">🧪 蓝铜胜肽到底是不是智商税？三好说实话</div>
+          <div class="xhs-text">
+            <p>最近夸迪蓝铜胜肽次抛风很大，作为产品经理必须扒一下。</p>
+            <p><b>蓝铜胜肽是什么：</b>由铜离子+三肽-1组成，能促进胶原蛋白、修护屏障，<b>原料成本极高</b>，所以便宜产品大概率"概念添加"。</p>
+            <p><b>适合谁：</b>医美术后、屏障受损、想兼顾抗老的敏感肌。</p>
+            <p><b>注意搭配：</b>别和高浓度VC、A醇、酸类一起用，会失活！</p>
+            <p><b>三好评分：</b>修护 ⭐⭐⭐⭐⭐ / 抗老 ⭐⭐⭐⭐ / 性价比 ⭐⭐⭐⭐</p>
+          </div>
+          <div class="xhs-tags"><span>#蓝铜胜肽</span><span>#夸迪</span><span>#成分党</span><span>#屏障修护</span></div>
+          <button class="copy-btn">📋 一键复制</button>
+        </article>
+
+        <!-- === 图文种草卡：夸迪蓝铜胜肽次抛 === -->
+        <article class="xhs-card xhs-visual">
+          <div class="xhs-img-area">
+            <div class="img-icon">🔵💧</div>
+            <div class="img-label">夸迪 蓝铜胜肽次抛 · 1.5ml×30支</div>
+            <div class="img-tip">📸 建议配图：次抛排列 + 蓝色液体特写，干净白底或浅蓝背景</div>
+          </div>
+          <div class="xhs-body">
+            <div class="xhs-title">🔵 一支稳住年轻感！夸迪蓝铜胜肽次抛我用空了2盒</div>
+            <div class="xhs-copy">
+              <b>【产品一句话】</b>华熙生物出品，蓝铜胜肽+5D玻尿酸，修护抗老一次搞定。<br>
+              <b>【我的感受】</b>做完光子嫩肤后连用7天，褪红速度肉眼可见变快。<br>
+              <b>【怎么用】</b>早晚各半支，水之后、面霜之前，不要和酸/VC叠加。<br>
+              <b>【价格】</b>338/30支，大促能到280左右，可囤。
+            </div>
+          </div>
+          <div class="xhs-tags"><span>#夸迪</span><span>#蓝铜胜肽</span><span>#次抛精华</span><span>#医美修护</span></div>
+          <button class="copy-btn">📋 一键复制</button>
+        </article>
+
+        <!-- === 纯文字爆款文章 === -->
+        <article class="xhs-card">
+          <div class="xhs-title">💄 美国小众水光腮红 Saie｜黄皮显白拿捏了</div>
+          <div class="xhs-text">
+            <p>今天推荐一个我新挖到的美国纯净美妆腮红——Saie Dew Blush。</p>
+            <p><b>质地：</b>液体腮红，推开是淡淡水光感，<b>不会破坏底妆</b>。</p>
+            <p><b>色号建议：</b>黄皮选"Rosy"或"Peachy"，白皮"Pinch"很嫩。</p>
+            <p><b>用法：</b>点涂在脸颊，用粉扑或手指拍开，定妆前用。</p>
+            <p><b>感受：</b>新手友好，怎么涂都不会猴屁股，一整天都有好气色。价格185/12ml，Sephora或买手店都能入。</p>
+          </div>
+          <div class="xhs-tags"><span>#Saie</span><span>#液体腮红</span><span>#水光感</span><span>#纯净美妆</span></div>
+          <button class="copy-btn">📋 一键复制</button>
+        </article>
+
+        <!-- === 纯文字爆款文章 === -->
+        <article class="xhs-card">
+          <div class="xhs-title">🧴 德系抗老精华值不值得买？优色林3D抗皱实测</div>
+          <div class="xhs-text">
+            <p>优色林不是只有修护霜，这瓶3D抗皱精华被低估了。</p>
+            <p><b>核心：</b>透明质酸填充细纹 + 白藜芦醇抗氧化 + 甘草查尔酮A舒缓。</p>
+            <p><b>肤感：</b>乳液质地，干皮够润、油皮不腻，敏感肌可用。</p>
+            <p><b>效果：</b>我连续用了4周，法令纹区域有变平整，肤色也更均匀。</p>
+            <p><b>价格：</b>289/30ml，德国药妆店常断货，建议大促囤。</p>
+          </div>
+          <div class="xhs-tags"><span>#优色林</span><span>#抗皱精华</span><span>#德系护肤</span><span>#敏感肌抗老</span></div>
+          <button class="copy-btn">📋 一键复制</button>
+        </article>
+
+        <!-- === 纯文字爆款文章 === -->
+        <article class="xhs-card">
+          <div class="xhs-title">🌸 日系美白怎么选？澳尔滨雅思淡斑精华使用报告</div>
+          <div class="xhs-text">
+            <p>日系美白绕不开曲酸，澳尔滨这瓶是局部淡斑利器。</p>
+            <p><b>适合：</b>有晒斑、痘印色素沉淀的姐妹，全脸提亮也OK。</p>
+            <p><b>用法：</b>点涂在斑点处，白天必须防晒！</p>
+            <p><b>质地：</b>水润精华乳，不黏腻，后续跟妆不搓泥。</p>
+            <p><b>三好评分：</b>淡斑 ⭐⭐⭐⭐ / 肤感 ⭐⭐⭐⭐⭐ / 温和度 ⭐⭐⭐⭐。680/40ml，日本专柜或海外旗舰店入。</p>
+          </div>
+          <div class="xhs-tags"><span>#澳尔滨</span><span>#美白淡斑</span><span>#日系护肤</span><span>#曲酸</span></div>
+          <button class="copy-btn">📋 一键复制</button>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ============== 6. 抖音宠物号 · 账号打造 ============== -->
+    <section class="view" id="view-douyin">
+      <div class="douyin-layout">
+
+        <!-- 左栏：任务清单 -->
+        <div class="card">
+          <div class="card-head"><h3>🐾 账号打造任务清单</h3><span class="more" id="taskReset">重置</span></div>
+
+          <div class="task-group">
+            <div class="task-group-title">📅 每日任务 <span class="badge-mini">每天必做</span></div>
+            <div class="task-item" data-task="d1">
+              <input type="checkbox" id="t_d1"><label class="task-label" for="t_d1">拍摄宠物素材（至少 3 段，每段 15-60 秒）<small>手机拍摄即可，注意光线充足、画面稳定</small></label>
+            </div>
+            <div class="task-item" data-task="d2">
+              <input type="checkbox" id="t_d2"><label class="task-label" for="t_d2">刷抖音宠物热门榜单，收藏 5 条爆款视频<small>分析爆款结构：前 3 秒钩子 + BGM + 文案套路</small></label>
+            </div>
+            <div class="task-item" data-task="d3">
+              <input type="checkbox" id="t_d3"><label class="task-label" for="t_d3">回复所有评论 + 私信（30 分钟内完成）<small>回复要有「人设感」，不要只发表情</small></label>
+            </div>
+            <div class="task-item" data-task="d4">
+              <input type="checkbox" id="t_d4"><label class="task-label" for="t_d4">主动互动 10 条同赛道账号（点赞+走心评论）<small>评论要具体，不要「好可爱」这种通用话术</small></label>
+            </div>
+            <div class="task-item" data-task="d5">
+              <input type="checkbox" id="t_d5"><label class="task-label" for="t_d5">记录今日热门音乐 / 话题标签到选题库<small>打开抖音→搜索「宠物」→看话题榜</small></label>
+            </div>
+          </div>
+
+          <div class="task-group">
+            <div class="task-group-title">📆 每 2-3 天任务</div>
+            <div class="task-item" data-task="w1">
+              <input type="checkbox" id="t_w1"><label class="task-label" for="t_w1"><b>剪辑并发布 1 条视频</b>（使用右侧剪辑器）<small>发布时间：12:00-13:00 或 18:00-20:00（宠物号流量高峰）</small></label>
+            </div>
+            <div class="task-item" data-task="w2">
+              <input type="checkbox" id="t_w2"><label class="task-label" for="t_w2">分析上条视频数据：完播率 + 互动率 + 涨粉数<small>打开抖音创作者中心查看，低于 30% 完播需调整前 3 秒</small></label>
+            </div>
+            <div class="task-item" data-task="w3">
+              <input type="checkbox" id="t_w3"><label class="task-label" for="t_w3">研究 3 个对标宠物号的最近爆款，拆解结构<small>记录：标题 / 前 3 秒 / BGM / 时长 / 评论区互动方式</small></label>
+            </div>
+          </div>
+
+          <div class="task-group">
+            <div class="task-group-title">📊 每周任务 <span class="badge-mini">周日</span></div>
+            <div class="task-item" data-task="m1">
+              <input type="checkbox" id="t_m1"><label class="task-label" for="t_m1">本周数据复盘：播放量 / 涨粉 / 互动 / 最高视频<small>用表格记录，对比上周趋势</small></label>
+            </div>
+            <div class="task-item" data-task="m2">
+              <input type="checkbox" id="t_m2"><label class="task-label" for="t_m2">制定下周内容日历（至少 3 条视频选题）<small>提前想好脚本 + 拍摄场景 + 需要的道具</small></label>
+            </div>
+            <div class="task-item" data-task="m3">
+              <input type="checkbox" id="t_m3"><label class="task-label" for="t_m3">整理手机素材，备份到云端，清理无用片段<small>释放手机空间，拍摄不会卡顿</small></label>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右栏：视频剪辑工具 -->
+        <div class="card">
+          <div class="card-head"><h3>✂️ 简易视频剪辑器</h3><span class="more">无需安装</span></div>
+          <div class="editor-area">
+            <!-- 预览区 -->
+            <div class="editor-video-wrap" id="editorPreview">
+              <div class="placeholder">📹 上传视频开始剪辑</div>
+            </div>
+            <!-- 上传 -->
+            <div class="editor-upload">
+              <label for="videoFile">📁 选择视频</label>
+              <input type="file" id="videoFile" accept="video/*">
+              <span class="file-name" id="fileName"></span>
+            </div>
+            <!-- 裁剪控制 -->
+            <div class="trim-controls">
+              <div class="trim-row">
+                <label>开始</label>
+                <input type="range" id="trimStart" min="0" max="100" value="0" step="1">
+                <span class="time-val" id="startTime">00:00</span>
+              </div>
+              <div class="trim-row">
+                <label>结束</label>
+                <input type="range" id="trimEnd" min="0" max="100" value="100" step="1">
+                <span class="time-val" id="endTime">00:00</span>
+              </div>
+            </div>
+            <!-- 文字叠加 -->
+            <div class="overlay-row">
+              <input type="text" id="overlayText" placeholder="叠加文字（如：@你的抖音号）" maxlength="30">
+              <select id="overlayPos">
+                <option value="bottom">底部居中</option>
+                <option value="top">顶部居中</option>
+                <option value="center">画面中央</option>
+              </select>
+            </div>
+            <!-- 操作按钮 -->
+            <div class="editor-btns">
+              <button class="btn-preview" id="btnPreview">▶ 预览片段</button>
+              <button class="btn-export" id="btnExport" disabled>⬇ 导出视频</button>
+            </div>
+            <div class="editor-status" id="editorStatus"></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============== 7. 相机学习 · 富士 XM5 ============== -->
+    <section class="view" id="view-camera">
+      <div class="cam-layout">
+
+        <!-- 左栏：相机速查 + 视频教程 -->
+        <div>
+          <!-- 相机速查 -->
+          <div class="cam-card" style="margin-bottom:16px;">
+            <h3><span class="cam-icon">📸</span>我的相机 · FUJIFILM X-M5</h3>
+            <div class="cam-specs">
+              <div class="spec"><span class="lbl">传感器</span><span class="val">2610万 X-Trans CMOS 4</span></div>
+              <div class="spec"><span class="lbl">处理器</span><span class="val">X-Processor 5</span></div>
+              <div class="spec"><span class="lbl">重量</span><span class="val">≈355g（含电池+卡）</span></div>
+              <div class="spec"><span class="lbl">胶片模拟</span><span class="val">20 种（含 Reala Ace）</span></div>
+              <div class="spec"><span class="lbl">对焦</span><span class="val">AI 检测自动对焦</span></div>
+              <div class="spec"><span class="lbl">视频</span><span class="val">6.2K/30P · 4K/60P</span></div>
+              <div class="spec"><span class="lbl">防抖</span><span class="val">数码防抖（DIS）</span></div>
+              <div class="spec"><span class="lbl">屏幕</span><span class="val">3.0寸 162万点 翻转屏</span></div>
+            </div>
+          </div>
+          <!-- 镜头装备 -->
+          <div class="cam-card" style="margin-bottom:16px;">
+            <h3><span class="cam-icon">🔭</span>我的镜头</h3>
+            <div class="lens-item">
+              <div class="lens-head">
+                <span class="lens-name">FUJIFILM XF 15-45mm f/3.5-5.6 OIS PZ</span>
+                <span class="lens-tag tag-daily">挂机日常</span>
+              </div>
+              <div class="cam-specs">
+                <div class="spec"><span class="lbl">焦段</span><span class="val">15-45mm（等效 23-69mm）</span></div>
+                <div class="spec"><span class="lbl">光圈</span><span class="val">f/3.5-5.6</span></div>
+                <div class="spec"><span class="lbl">重量</span><span class="val">≈135g 超轻</span></div>
+                <div class="spec"><span class="lbl">滤镜</span><span class="val">52mm</span></div>
+                <div class="spec"><span class="lbl">防抖</span><span class="val">OIS 光学防抖</span></div>
+                <div class="spec"><span class="lbl">特色</span><span class="val">电动变焦 · 可伸缩</span></div>
+              </div>
+              <div class="lens-tip">💡 适合：日常扫街 / vlog 视频 / 风光旅游。电动变焦拍视频丝滑无噪声，轻便挂机首选。广角端拍风景，长焦端拍特写。</div>
+            </div>
+            <div class="lens-item">
+              <div class="lens-head">
+                <span class="lens-name">唯卓仕 56mm f/1.7</span>
+                <span class="lens-tag tag-portrait">人像特化</span>
+              </div>
+              <div class="cam-specs">
+                <div class="spec"><span class="lbl">焦段</span><span class="val">56mm（等效 85mm）</span></div>
+                <div class="spec"><span class="lbl">光圈</span><span class="val">f/1.7 大光圈</span></div>
+                <div class="spec"><span class="lbl">重量</span><span class="val">≈295g</span></div>
+                <div class="spec"><span class="lbl">滤镜</span><span class="val">52mm</span></div>
+                <div class="spec"><span class="lbl">最近对焦</span><span class="val">0.6m</span></div>
+                <div class="spec"><span class="lbl">特色</span><span class="val">奶油虚化 · 支持自动对焦</span></div>
+              </div>
+              <div class="lens-tip">💡 适合：人像 / 美食 / 静物特写 / 夜景。85mm 是经典人像黄金焦段，f/1.7 全开虚化柔和，弱光环境下也能手持出片。</div>
+            </div>
+          </div>
+          <!-- 视频教程 -->
+          <div class="cam-card">
+            <h3><span class="cam-icon">🎬</span>视频教程 · 跟着学</h3>
+            <div class="cam-video-row">
+              <a class="cam-video-item" href="https://www.bilibili.com/video/BV14g5Q6tEur/" target="_blank" rel="noopener">
+                <div class="play-icon">▶</div>
+                <div class="cam-video-info">
+                  <div class="vt">B站 · X-M5 新手速通教程</div>
+                  <div class="vs">全面新手攻略 + 胶片模拟参数配方</div>
+                </div>
+              </a>
+              <a class="cam-video-item" href="https://www.bilibili.com/video/BV1a6ycY6EYW/" target="_blank" rel="noopener">
+                <div class="play-icon">▶</div>
+                <div class="cam-video-info">
+                  <div class="vt">B站 · 胶片模拟配方设置逻辑</div>
+                  <div class="vs">搞懂参数调整原理，不再瞎调</div>
+                </div>
+              </a>
+            </div>
+            <div class="cam-video-row" style="margin-top:10px;">
+              <a class="cam-video-item" href="https://fujixweekly.com/recipes/" target="_blank" rel="noopener">
+                <div class="play-icon">🌐</div>
+                <div class="cam-video-info">
+                  <div class="vt">Fuji X Weekly · 配方大全</div>
+                  <div class="vs">全球最大的富士胶片模拟配方库（英文）</div>
+                </div>
+              </a>
+              <a class="cam-video-item" href="https://github.com/adrianzzk/fujifilm-recipes" target="_blank" rel="noopener">
+                <div class="play-icon">📂</div>
+                <div class="cam-video-info">
+                  <div class="vt">GitHub · 中文配方合集</div>
+                  <div class="vs">百余款配方 Markdown 整理，可直接抄作业</div>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右栏：新手技巧 -->
+        <div>
+          <div class="cam-card">
+            <h3><span class="cam-icon">💡</span>新手快速上手 6 件事</h3>
+            <div class="cam-tips">
+              <div class="cam-tip"><b>① 先搞懂 PASM 档位</b><br>P=程序自动 / A=光圈优先（最常用） / S=快门优先 / M=全手动。新手从 A 档开始拍。</div>
+              <div class="cam-tip"><b>② 学会存自定义配方</b><br>MENU → IQ → 编辑/保存自定义设置。XM5 可存 7 组 C1-C7，一次调好反复调用。</div>
+              <div class="cam-tip"><b>③ Q 键是你的好朋友</b><br>按 Q 键进入快捷菜单，可快速切换胶片模拟、白平衡、颗粒等，不用翻 MENU。</div>
+              <div class="cam-tip"><b>④ 曝光补偿转盘要会用</b><br>富士直出通常 +1/3 到 +2/3 EV 更好看。拍白色场景要加曝光，黑色场景要减。</div>
+              <div class="cam-tip"><b>⑤ RAW+JPEG 双格式</b><br>JPEG 直出发朋友圈，RAW 留底后期。胶片模拟只影响 JPEG，RAW 是原始数据。</div>
+              <div class="cam-tip"><b>⑥ 胶片模拟 ≠ 后期滤镜</b><br>它是机内渲染引擎！颗粒、白平衡偏移、色调曲线都会改变最终画面，多试多拍。</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 全宽：胶片模拟配方 -->
+        <div class="cam-full">
+          <div class="cam-card">
+            <h3 style="margin-bottom:16px;"><span class="cam-icon">🎞️</span>胶片模拟配方 · 直接抄作业</h3>
+
+            <!-- 配方 1：Classic Negative 港风 -->
+            <div class="recipe-card">
+              <h4>🇭🇰 NC 港风胶片感 <span class="recipe-tag">万能公式</span></h4>
+              <div class="recipe-scene">🎯 适合：街拍 / 日常 / 人像 · 王家卫电影感</div>
+              <div class="recipe-params">
+                <div class="rp"><span class="k">胶片模拟</span><span class="v">Classic Negative</span></div>
+                <div class="rp"><span class="k">颗粒效果</span><span class="v">强 · 大</span></div>
+                <div class="rp"><span class="k">色彩效果</span><span class="v">强</span></div>
+                <div class="rp"><span class="k">彩色FX蓝色</span><span class="v">强</span></div>
+                <div class="rp"><span class="k">白平衡</span><span class="v">5100K · R-2 B+2</span></div>
+                <div class="rp"><span class="k">动态范围</span><span class="v">DR400</span></div>
+                <div class="rp"><span class="k">色调曲线</span><span class="v">H-1 · S-1</span></div>
+                <div class="rp"><span class="k">色彩</span><span class="v">+2</span></div>
+                <div class="rp"><span class="k">锐度</span><span class="v">0</span></div>
+                <div class="rp"><span class="k">高ISO降噪</span><span class="v">-4</span></div>
+                <div class="rp"><span class="k">清晰度</span><span class="v">-2</span></div>
+                <div class="rp"><span class="k">曝光补偿</span><span class="v">+1/3 ~ +2/3</span></div>
+              </div>
+            </div>
+
+            <!-- 配方 2：Nostalgia Negative 复古 -->
+            <div class="recipe-card" style="border-left-color:#7B68AE;">
+              <h4>📽️ Nostalgia Neg 复古暖调 <span class="recipe-tag" style="background:#F3EEFA;color:#7B68AE;">进阶</span></h4>
+              <div class="recipe-scene">🎯 适合：风景 / 人像 / 街头 · 黄金时段出片利器</div>
+              <div class="recipe-params">
+                <div class="rp"><span class="k">胶片模拟</span><span class="v">Nostalgic Neg.</span></div>
+                <div class="rp"><span class="k">颗粒效果</span><span class="v">强 · 小</span></div>
+                <div class="rp"><span class="k">色彩效果</span><span class="v">强</span></div>
+                <div class="rp"><span class="k">彩色FX蓝色</span><span class="v">弱</span></div>
+                <div class="rp"><span class="k">白平衡</span><span class="v">晴天 · R+3 B-3</span></div>
+                <div class="rp"><span class="k">动态范围</span><span class="v">DR400</span></div>
+                <div class="rp"><span class="k">色调曲线</span><span class="v">H-1 · S+1</span></div>
+                <div class="rp"><span class="k">色彩</span><span class="v">+4</span></div>
+                <div class="rp"><span class="k">锐度</span><span class="v">-1</span></div>
+                <div class="rp"><span class="k">高ISO降噪</span><span class="v">-4</span></div>
+                <div class="rp"><span class="k">清晰度</span><span class="v">-3</span></div>
+                <div class="rp"><span class="k">曝光补偿</span><span class="v">0 ~ +2/3</span></div>
+              </div>
+            </div>
+
+            <!-- 配方 3：Reala Ace 清新 -->
+            <div class="recipe-card" style="border-left-color:#4A90D9;">
+              <h4>🩵 Reala Ace 清新自然 <span class="recipe-tag" style="background:#EDF4FC;color:#4A90D9;">日系</span></h4>
+              <div class="recipe-scene">🎯 适合：日常记录 / 旅行 / 风景 · 高保真色彩还原</div>
+              <div class="recipe-params">
+                <div class="rp"><span class="k">胶片模拟</span><span class="v">Classic Negative（近似RA）</span></div>
+                <div class="rp"><span class="k">颗粒效果</span><span class="v">弱 · 小</span></div>
+                <div class="rp"><span class="k">色彩效果</span><span class="v">强</span></div>
+                <div class="rp"><span class="k">彩色FX蓝色</span><span class="v">强</span></div>
+                <div class="rp"><span class="k">白平衡</span><span class="v">自动 · R-1 B+1</span></div>
+                <div class="rp"><span class="k">动态范围</span><span class="v">DR400</span></div>
+                <div class="rp"><span class="k">色调曲线</span><span class="v">H-1.5 · S-2</span></div>
+                <div class="rp"><span class="k">色彩</span><span class="v">+2</span></div>
+                <div class="rp"><span class="k">锐度</span><span class="v">0</span></div>
+                <div class="rp"><span class="k">高ISO降噪</span><span class="v">-4</span></div>
+                <div class="rp"><span class="k">清晰度</span><span class="v">-2</span></div>
+                <div class="rp"><span class="k">曝光补偿</span><span class="v">-1/3 ~ +1</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 每周任务 -->
+        <div class="cam-full">
+          <div class="cam-card cam-tasks">
+            <h3 style="margin-bottom:14px;"><span class="cam-icon">📋</span>每周拍摄任务 <span class="cam-week-tag">8月第2周</span></h3>
+
+            <div class="task-group">
+              <div class="task-group-title">📅 本周任务（8/7 - 8/13）</div>
+              <div class="task-item" data-cam-task="c1">
+                <input type="checkbox" id="cam_c1">
+                <label class="task-label" for="cam_c1">
+                  <b>任务一：NC 港风街拍</b> · 用「NC 港风胶片感」配方，拍一组街拍（至少 20 张）
+                  <small>📍 建议场景：老街、咖啡馆、黄昏街道 · 📝 拍完对比直出和手机的区别</small>
+                </label>
+              </div>
+              <div class="task-item" data-cam-task="c2">
+                <input type="checkbox" id="cam_c2">
+                <label class="task-label" for="cam_c2">
+                  <b>任务二：同一场景 × 3 种配方对比</b> · 选一个固定场景，分别用 NC / Nostalgia Neg / Reala Ace 各拍一张
+                  <small>📍 建议场景：窗边自然光静物或阳台外景 · 📝 体会三种配方的色彩差异</small>
+                </label>
+              </div>
+            </div>
+
+            <div style="margin-top:14px;padding:12px 14px;background:#FFFCF8;border-radius:10px;border:1px dashed #f0dcc8;font-size:13px;line-height:1.8;">
+              <b>💡 完成小贴士：</b><br>
+              • 每次出门带相机，哪怕只拍 5 分钟<br>
+              • 先不用纠结构图，熟悉参数是第一步<br>
+              • 每周任务做完记得勾选 ✅，给自己打卡<br>
+              • <b>下周一（8/14）</b> 我会更新新的任务和配方
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  /* ============== PWA Service Worker ============== */
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+
+    // 收到 SW 后台更新通知 → 显示 toast 提示刷新
+    navigator.serviceWorker.addEventListener('message', event => {
+      if (event.data && event.data.type === 'CONTENT_UPDATED') {
+        showToast();
+      }
+    });
+  }
+
+  /* ---- 内容更新 toast ---- */
+  function showToast() {
+    // 防止重复弹出
+    if (document.getElementById('update-toast')) return;
+    const toast = document.createElement('div');
+    toast.id = 'update-toast';
+    toast.style.cssText = 'position:fixed;bottom:calc(env(safe-area-inset-bottom, 0) + 20px);left:50%;transform:translateX(-50%);background:#D97757;color:#fff;padding:10px 24px;border-radius:24px;font-size:14px;font-weight:600;z-index:99999;box-shadow:0 4px 16px rgba(217,119,87,.4);display:flex;align-items:center;gap:6px;cursor:pointer;animation:toastIn .3s ease';
+    toast.innerHTML = '🔄 内容已更新，点击刷新';
+    toast.onclick = () => { window.location.reload(); };
+    document.body.appendChild(toast);
+    // 10 秒后自动消失
+    setTimeout(() => { if (toast.parentNode) toast.remove(); }, 10000);
+  }
+  const toastStyle = document.createElement('style');
+  toastStyle.textContent = '@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}';
+  document.head.appendChild(toastStyle);
+
+  /* ============== 侧边栏导航 ============== */
+  const sidebar = document.getElementById('sidebar');
+  const scrim   = document.getElementById('scrim');
+  const menuBtn = document.getElementById('menuBtn');
+  const pageTitle = document.getElementById('pageTitle');
+  const navItems = document.querySelectorAll('.nav-item');
+  const views = document.querySelectorAll('.view');
+
+  const titleMap = {
+    'view-beauty':  '每日美妆 · 全球新品速递',
+    'view-hot':     '当日热点 · 跨领域热搜',
+    'view-news':    '每日新闻 · 股市 / 基金速报',
+    'view-review':  '每日复盘 · 盘后波动解析',
+    'view-xhs':     '小红书文库 · 爆款美妆文章',
+    'view-douyin':  '抖音宠物号 · 账号打造',
+    'view-camera':  '📷 相机学习 · 富士 XM5'
+  };
+
+  function showView(viewId) {
+    views.forEach(v => v.classList.remove('active'));
+    const el = document.getElementById(viewId);
+    if (el) el.classList.add('active');
+    navItems.forEach(n => n.classList.toggle('active', n.dataset.view === viewId));
+    pageTitle.textContent = titleMap[viewId] || '个人工作台';
+    sidebar.classList.remove('open');
+    scrim.classList.remove('on');
+    document.getElementById('main').scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  navItems.forEach(n => n.addEventListener('click', () => showView(n.dataset.view)));
+
+  menuBtn.addEventListener('click', () => {
+    sidebar.classList.add('open');
+    scrim.classList.add('on');
+  });
+  scrim.addEventListener('click', () => {
+    sidebar.classList.remove('open');
+    scrim.classList.remove('on');
+  });
+
+  /* ============== 日期 ============== */
+  const dateText = document.getElementById('dateText');
+  const fmt = d => `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} ${['周日','周一','周二','周三','周四','周五','周六'][d.getDay()]}`;
+  dateText.textContent = fmt(new Date());
+
+  /* ============== 每日新闻数据 + 渲染 + 筛选 ============== */
+  const news = [
+    { t: '07:30', cat: 'macro', tag: '宏观', text: '8月7日A股收盘三大指数齐涨，沪指涨1.02%报3940.04，深成指涨1.42%，创业板指涨1.35%', impact: { lbl: '利好', note: '市场情绪修复，成长风格占优' } },
+    { t: '07:45', cat: 'macro', tag: '宏观', text: '沪深两市成交额达2.66万亿，较上一交易日放量1356亿，量能明显回升',               impact: { lbl: '增量', note: '资金回流，成交活跃度提升' } },
+    { t: '08:00', cat: 'ind',   tag: '行业', text: 'CRO概念掀涨停潮，板块整体涨10.63%，义翘神州等涨停',                            impact: { lbl: '强利好', note: '创新药 / CRO 估值修复' } },
+    { t: '08:15', cat: 'ind',   tag: '行业', text: 'PCB / 元件延续涨势，元件板块涨6.74%，景旺电子等多股涨停',                       impact: { lbl: '强利好', note: '电子布涨价、AI 算力需求带动' } },
+    { t: '08:30', cat: 'ind',   tag: '行业', text: '半导体板块走强，靶材 / 磷化铟方向领涨，有研新材涨停',                           impact: { lbl: '利好', note: '国产替代、半导体材料景气' } },
+    { t: '08:45', cat: 'ind',   tag: '行业', text: '稀土 / 小金属活跃，中国稀土、云南锗业涨停，有色金属板块涨3.19%',                impact: { lbl: '利好', note: '供给扰动、战略资源重估' } },
+    { t: '09:00', cat: 'co',    tag: '公司', text: '药明康德涨8.49%，带动CRO及创新药板块集体走强',                                  impact: { lbl: '利好', note: 'CXO龙头估值修复空间' } },
+    { t: '09:15', cat: 'co',    tag: '公司', text: '宁德时代中期分红61.8亿，每10股派14.11元，今日为股权登记日',                     impact: { lbl: '利好', note: '新能源产业链情绪提振' } },
+    { t: '09:30', cat: 'co',    tag: '公司', text: '宇树科技科创板申购开启，机器人产业链关注度提升',                                impact: { lbl: '强利好', note: '人形机器人、核心零部件' } },
+    { t: '09:45', cat: 'glob',  tag: '海外', text: '美股8月7日收高：道指涨0.28%，标普500创历史新高涨0.62%，纳指涨1.30%',             impact: { lbl: '外盘利好', note: '全球风险偏好回升' } },
+    { t: '10:00', cat: 'glob',  tag: '海外', text: '美国7月非农就业人数意外下滑，交易员预期美联储降息概率上升',                   impact: { lbl: '中性 / 偏多', note: '流动性预期改善，黄金走强' } },
+    { t: '10:15', cat: 'macro', tag: '宏观', text: '中国7月制造业PMI为49.8，较前值小幅回升，经济韧性增强',                         impact: { lbl: '利好', note: '经济预期修复，周期股关注' } },
+    { t: '10:30', cat: 'fund',  tag: '基金', text: '私募排排网：股票私募连续4周加仓，仓位升至近8成',                                impact: { lbl: '增量', note: '机构看多信号明确' } },
+    { t: '10:45', cat: 'ind',   tag: '行业', text: '创新药、化学制药板块涨超5%，百花医药4连板',                                     impact: { lbl: '强利好', note: '医药板块轮动上攻' } }
+  ];
+
+  const tagMap = { macro: 'tag-macro', ind: 'tag-ind', co: 'tag-co', glob: 'tag-glob', fund: 'tag-fund' };
+
+  function renderNews(cat = 'all') {
+    const list = document.getElementById('newsList');
+    list.innerHTML = '';
+    news
+      .filter(n => cat === 'all' || n.cat === cat)
+      .forEach(n => {
+        const item = document.createElement('div');
+        item.className = 'news-item';
+        item.innerHTML = `
+          <div class="time"><b>${n.t}</b>今天</div>
+          <div class="ttl"><span class="tag ${tagMap[n.cat]}">${n.tag}</span>${n.text}</div>
+          <div class="impact"><span class="lbl">${n.impact.lbl}</span>${n.impact.note}</div>
+        `;
+        list.appendChild(item);
+      });
+  }
+  renderNews();
+
+  document.querySelectorAll('#newsTabs button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#newsTabs button').forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+      renderNews(btn.dataset.cat);
+    });
+  });
+
+
+
+  /* ============== 小红书文章一键复制 ============== */
+  document.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const card = btn.closest('.xhs-card');
+      if (!card) return;
+      const title   = card.querySelector('.xhs-title').textContent.trim();
+      const bodyEl  = card.querySelector('.xhs-text') || card.querySelector('.xhs-copy');
+      const tags    = Array.from(card.querySelectorAll('.xhs-tags span'))
+                         .map(s => s.textContent.trim()).join(' ');
+      // 取纯文本（去掉 HTML 标签）
+      const body    = bodyEl ? bodyEl.innerText.trim() : '';
+      const fullText = `${title}\n\n${body}\n\n${tags}`;
+      navigator.clipboard.writeText(fullText).then(() => {
+        btn.textContent = '✅ 已复制';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = '📋 一键复制'; btn.classList.remove('copied'); }, 2000);
+      }).catch(() => alert('复制失败，请手动选中文字复制'));
+    });
+  });
+
+  /* ============== 抖音宠物号：任务勾选持久化 ============== */
+  const TASK_KEY = 'douyin_tasks';
+  function loadTasks() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(TASK_KEY) || '{}');
+      document.querySelectorAll('#view-douyin .task-item input[type=checkbox]').forEach(cb => {
+        cb.checked = !!saved[cb.id];
+        if (cb.checked) cb.closest('.task-item').classList.add('done');
+        else cb.closest('.task-item').classList.remove('done');
+      });
+    } catch(e) {}
+  }
+  function saveTasks() {
+    const state = {};
+    document.querySelectorAll('#view-douyin .task-item input[type=checkbox]').forEach(cb => {
+      state[cb.id] = cb.checked;
+    });
+    localStorage.setItem(TASK_KEY, JSON.stringify(state));
+  }
+  document.querySelectorAll('#view-douyin .task-item input[type=checkbox]').forEach(cb => {
+    cb.addEventListener('change', () => {
+      if (cb.checked) cb.closest('.task-item').classList.add('done');
+      else cb.closest('.task-item').classList.remove('done');
+      saveTasks();
+    });
+  });
+  document.getElementById('taskReset').addEventListener('click', () => {
+    if (!confirm('确定要重置所有任务为未完成？')) return;
+    document.querySelectorAll('#view-douyin .task-item input[type=checkbox]').forEach(cb => {
+      cb.checked = false;
+      cb.closest('.task-item').classList.remove('done');
+    });
+    localStorage.removeItem(TASK_KEY);
+  });
+  loadTasks();
+
+  /* ============== 抖音宠物号：视频剪辑器 ============== */
+  (function() {
+    const fileInput = document.getElementById('videoFile');
+    const fileNameEl = document.getElementById('fileName');
+    const previewWrap = document.getElementById('editorPreview');
+    const trimStart = document.getElementById('trimStart');
+    const trimEnd = document.getElementById('trimEnd');
+    const startTimeEl = document.getElementById('startTime');
+    const endTimeEl = document.getElementById('endTime');
+    const overlayText = document.getElementById('overlayText');
+    const overlayPos = document.getElementById('overlayPos');
+    const btnPreview = document.getElementById('btnPreview');
+    const btnExport = document.getElementById('btnExport');
+    const statusEl = document.getElementById('editorStatus');
+
+    let videoEl = null;
+    let videoFile = null;
+    let videoDuration = 0;
+    let previewTimer = null;
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let canvasEl = null;
+    let canvasCtx = null;
+    let canvasStream = null;
+
+    function fmtTime(s) {
+      const m = Math.floor(s / 60);
+      const sec = Math.floor(s % 60);
+      return String(m).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+    }
+
+    function setupVideo(file) {
+      if (videoEl) { videoEl.pause(); videoEl.remove(); }
+      if (canvasEl) { canvasEl.remove(); }
+      videoEl = document.createElement('video');
+      videoEl.src = URL.createObjectURL(file);
+      videoEl.preload = 'metadata';
+      videoEl.playsInline = true;
+      videoEl.muted = true;
+      videoEl.style.width = '100%';
+      videoEl.style.maxHeight = '380px';
+      videoEl.style.display = 'block';
+      videoEl.onloadedmetadata = () => {
+        videoDuration = videoEl.duration;
+        trimEnd.max = 100;
+        trimEnd.value = 100;
+        trimStart.value = 0;
+        endTimeEl.textContent = fmtTime(videoDuration);
+        startTimeEl.textContent = '00:00';
+        previewWrap.innerHTML = '';
+        previewWrap.appendChild(videoEl);
+        btnExport.disabled = false;
+        statusEl.textContent = '✅ 视频已加载 · 拖动滑块设置裁剪区间';
+        statusEl.className = 'editor-status success';
+      };
+      videoEl.onerror = () => {
+        statusEl.textContent = '❌ 视频加载失败，请检查格式（MP4/MOV/WebM）';
+        statusEl.className = 'editor-status';
+      };
+    }
+
+    fileInput.addEventListener('change', (e) => {
+      const f = e.target.files[0];
+      if (!f) return;
+      if (!f.type.startsWith('video/')) {
+        statusEl.textContent = '⚠️ 请选择视频文件';
+        statusEl.className = 'editor-status';
+        return;
+      }
+      videoFile = f;
+      fileNameEl.textContent = f.name;
+      btnExport.disabled = true;
+      statusEl.textContent = '⏳ 正在解析视频...';
+      statusEl.className = 'editor-status';
+      setupVideo(f);
+    });
+
+    trimStart.addEventListener('input', () => {
+      const s = parseInt(trimStart.value);
+      const e = parseInt(trimEnd.value);
+      if (s >= e) trimStart.value = e - 1;
+      startTimeEl.textContent = fmtTime((parseInt(trimStart.value) / 100) * videoDuration);
+    });
+    trimEnd.addEventListener('input', () => {
+      const s = parseInt(trimStart.value);
+      const e = parseInt(trimEnd.value);
+      if (e <= s) trimEnd.value = s + 1;
+      endTimeEl.textContent = fmtTime((parseInt(trimEnd.value) / 100) * videoDuration);
+    });
+
+    btnPreview.addEventListener('click', () => {
+      if (!videoEl || !videoDuration) {
+        statusEl.textContent = '⚠️ 请先上传视频';
+        statusEl.className = 'editor-status';
+        return;
+      }
+      if (previewTimer) { clearTimeout(previewTimer); videoEl.pause(); }
+      const s = (parseInt(trimStart.value) / 100) * videoDuration;
+      const e = (parseInt(trimEnd.value) / 100) * videoDuration;
+      videoEl.currentTime = s;
+      videoEl.play();
+      statusEl.textContent = '▶ 正在预览裁剪片段...';
+      statusEl.className = 'editor-status';
+      previewTimer = setTimeout(() => { videoEl.pause(); }, (e - s) * 1000 + 200);
+    });
+
+    btnExport.addEventListener('click', () => {
+      if (!videoEl || !videoDuration) {
+        statusEl.textContent = '⚠️ 请先上传视频';
+        statusEl.className = 'editor-status';
+        return;
+      }
+      const s = (parseInt(trimStart.value) / 100) * videoDuration;
+      const e = (parseInt(trimEnd.value) / 100) * videoDuration;
+      const dur = e - s;
+      if (dur < 0.5) {
+        statusEl.textContent = '⚠️ 裁剪区间太短（至少 0.5 秒）';
+        statusEl.className = 'editor-status';
+        return;
+      }
+      statusEl.textContent = '⏳ 正在处理视频...';
+      statusEl.className = 'editor-status';
+      btnExport.disabled = true;
+
+      if (!canvasEl) {
+        canvasEl = document.createElement('canvas');
+        canvasEl.width = videoEl.videoWidth || 1080;
+        canvasEl.height = videoEl.videoHeight || 1920;
+        canvasCtx = canvasEl.getContext('2d');
+        canvasStream = canvasEl.captureStream(30);
+      } else {
+        canvasEl.width = videoEl.videoWidth || 1080;
+        canvasEl.height = videoEl.videoHeight || 1920;
+      }
+
+      recordedChunks = [];
+      const text = overlayText.value.trim();
+      const pos = overlayPos.value;
+
+      try {
+        mediaRecorder = new MediaRecorder(canvasStream, { mimeType: 'video/webm;codecs=vp9', videoBitsPerSecond: 4000000 });
+      } catch(e1) {
+        try {
+          mediaRecorder = new MediaRecorder(canvasStream, { mimeType: 'video/webm;codecs=vp8', videoBitsPerSecond: 4000000 });
+        } catch(e2) {
+          mediaRecorder = new MediaRecorder(canvasStream, { mimeType: 'video/webm', videoBitsPerSecond: 4000000 });
+        }
+      }
+
+      mediaRecorder.ondataavailable = (ev) => { if (ev.data.size > 0) recordedChunks.push(ev.data); };
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(recordedChunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = '宠物视频_' + new Date().toISOString().slice(0, 10) + '.webm';
+        a.click();
+        URL.revokeObjectURL(url);
+        statusEl.textContent = '✅ 导出完成！视频已下载。可用剪映/CapCut 转 MP4 格式';
+        statusEl.className = 'editor-status success';
+        btnExport.disabled = false;
+      };
+
+      mediaRecorder.start();
+      videoEl.currentTime = s;
+      videoEl.muted = true;
+      videoEl.play();
+
+      function drawFrame() {
+        if (videoEl.paused || videoEl.ended || videoEl.currentTime >= e) {
+          mediaRecorder.stop();
+          videoEl.pause();
+          return;
+        }
+        canvasCtx.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
+        if (text) {
+          const fontSize = Math.max(28, Math.floor(canvasEl.width / 18));
+          canvasCtx.font = 'bold ' + fontSize + 'px "PingFang SC","Microsoft YaHei",sans-serif';
+          canvasCtx.textAlign = 'center';
+          canvasCtx.fillStyle = 'rgba(0,0,0,0.5)';
+          const tw = canvasCtx.measureText(text).width;
+          let ty;
+          if (pos === 'top') ty = fontSize + 30;
+          else if (pos === 'center') ty = canvasEl.height / 2;
+          else ty = canvasEl.height - 50;
+          const pad = 16;
+          canvasCtx.fillRect(canvasEl.width / 2 - tw / 2 - pad, ty - fontSize + pad / 2, tw + pad * 2, fontSize + pad);
+          canvasCtx.fillStyle = '#fff';
+          canvasCtx.fillText(text, canvasEl.width / 2, ty);
+        }
+        requestAnimationFrame(drawFrame);
+      }
+
+      videoEl.addEventListener('seeked', function once() {
+        videoEl.removeEventListener('seeked', once);
+        drawFrame();
+      }, { once: true });
+    });
+  })();
+
+  /* ============== 刷新按钮 ============== */
+  document.getElementById('refreshBtn').addEventListener('click', () => {
+    dateText.textContent = fmt(new Date()) + ' · 已刷新';
+    setTimeout(() => { dateText.textContent = fmt(new Date()); }, 1500);
+  });
+</script>
+</body>
+</html>
