@@ -5,7 +5,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>三好工作台</title>
-  <link rel="manifest" href="pwa-manifest.json?v=3" />
+  <link rel="manifest" href="pwa-manifest.json?v=4" />
   <link rel="apple-touch-icon" href="icon-180.png" />
   <link rel="icon" href="icon-192.png" />
   <style type="text/css">
@@ -29,7 +29,7 @@
     //<![CDATA[
     // PWA 入口页 v3：用 iframe + srcdoc 绕过 jsdelivr 把 .html 当 text/plain 返回的问题
     // 不再依赖 Service Worker 修复 content-type，SW 仅用于缓存与离线加速
-    var MAIN = '工作台.html';
+    var MAIN = 'app.html';
     var loaded = false;
 
     function injectHtml(html) {
@@ -65,7 +65,7 @@
     }
 
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('pwa-sw.js?v=3')
+      navigator.serviceWorker.register('pwa-sw.js?v=4')
         .then(function() { return navigator.serviceWorker.ready; })
         .then(function() { loadMain(); })
         .catch(function() { loadMain(); });

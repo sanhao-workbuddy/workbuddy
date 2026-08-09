@@ -2,7 +2,7 @@
   "name": "三好个人工作台",
   "short_name": "三好工作台",
   "description": "每日美妆 · 当日热点 · 每日新闻 · 每日复盘 · 小红书文库 · 抖音宠物号 · 相机学习 · 漫剧制作 · 小说制作",
-  "start_url": "pwa.xhtml",
+  "start_url": "pwa.xhtml?v=4",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#FAF6EF",

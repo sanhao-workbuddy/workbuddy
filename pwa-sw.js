@@ -1,9 +1,9 @@
-const CACHE = 'sanhao-workbench-v13';  // v13: 入口页改为 iframe/srcdoc，预缓存入口页，SW 不再承担 content-type 修复主责
+const CACHE = 'sanhao-workbench-v14';  // v14: 主内容改用新文件名 app.html，避开 jsdelivr 对 工作台.html 的顽固缓存
 
 /* ---- 所有需要预缓存的资源（含 HTML） ---- */
 const PRECACHE_ASSETS = [
   'pwa.xhtml',
-  '工作台.html',
+  'app.html',
   'pwa-manifest.json',
   'icon-192.png',
   'icon-512.png',
@@ -74,7 +74,7 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  const isPage = e.request.mode === 'navigate' || url.pathname.includes('%E5%B7%A5') || url.pathname.includes('工作台');
+  const isPage = e.request.mode === 'navigate' || url.pathname.includes('%E5%B7%A5') || url.pathname.includes('工作台') || url.pathname.includes('app.html');
 
   e.respondWith(
     caches.match(e.request).then(cached => {
