@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-title" content="三好个人工作台" />
 <meta name="theme-color" content="#FAF6EF" />
 <meta name="mobile-web-app-capable" content="yes" />
-<link rel="manifest" href="pwa-manifest.json" />
+<link rel="manifest" href="manifest.json" />
 <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png" />
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <title>三好个人工作台</title>
@@ -653,6 +653,215 @@
     .cam-specs { grid-template-columns: 1fr; }
   }
 
+  /* ================= 7. 漫剧制作 ================= */
+  .comic-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .comic-layout .comic-full { grid-column: 1 / -1; }
+
+  /* 阶段路线图 */
+  .stage-card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+  }
+  .stage-card .stage-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--orange-bg);
+  }
+  .stage-card .stage-num {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: var(--orange); color: #fff;
+    display: grid; place-items: center;
+    font-weight: 800; font-size: 16px;
+  }
+  .stage-card .stage-title { font-size: 15px; font-weight: 700; }
+  .stage-card .stage-sub { font-size: 11px; color: var(--ink-fade); margin-top: 2px; }
+  .stage-card .checklist { list-style: none; padding: 0; margin: 0; }
+  .stage-card .checklist li {
+    display: flex; align-items: flex-start; gap: 8px;
+    padding: 7px 0; font-size: 13px; line-height: 1.55;
+    color: var(--ink-soft); border-bottom: 1px solid #f8f3ea;
+  }
+  .stage-card .checklist li:last-child { border-bottom: none; }
+  .stage-card .checklist li .chk {
+    width: 20px; height: 20px; accent-color: var(--orange);
+    flex-shrink: 0; margin-top: 2px;
+  }
+
+  /* 视频教程网格 */
+  .comic-video-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .comic-video-item {
+    background: #fff; border-radius: 12px; padding: 14px;
+    border: 1px solid #f0ebe0; text-decoration: none; color: var(--ink);
+    display: flex; align-items: center; gap: 12px;
+    transition: box-shadow .2s;
+  }
+  .comic-video-item:hover { box-shadow: 0 2px 10px rgba(0,0,0,.08); }
+  .comic-video-item .play-dot {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: linear-gradient(135deg, #6C5CE7, #A29BFE); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+  .comic-video-item .v-info { font-size: 13px; line-height: 1.5; }
+  .comic-video-item .v-info .vt { font-weight: 600; }
+  .comic-video-item .v-info .vs { font-size: 11px; color: var(--ink-fade); }
+
+  /* 工具推荐 */
+  .tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+  .tool-item {
+    background: #FFFCF8; border: 1px solid #f5efe5;
+    border-radius: 12px; padding: 14px; text-align: center;
+  }
+  .tool-item .tool-ico { font-size: 32px; margin-bottom: 6px; }
+  .tool-item .tool-name { font-size: 13px; font-weight: 700; color: var(--ink); }
+  .tool-item .tool-desc { font-size: 11px; color: var(--ink-fade); margin-top: 2px; }
+  .tool-item .tool-tag {
+    display: inline-block; margin-top: 6px;
+    font-size: 10px; padding: 2px 8px; border-radius: 999px;
+    font-weight: 600;
+  }
+  .tool-tag.free { background: #E8F8E8; color: #27AE60; }
+  .tool-tag.pro { background: var(--orange-bg); color: var(--orange); }
+
+  @media (max-width: 768px) {
+    .comic-layout { grid-template-columns: 1fr; }
+    .comic-video-grid { grid-template-columns: 1fr; }
+    .tool-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* ================= 8. 小说制作 ================= */
+  .novel-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .novel-layout .novel-full { grid-column: 1 / -1; }
+
+  /* 热门小说卡片 */
+  .novel-hot-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+  }
+  .novel-hot-card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+  }
+  .novel-hot-card .hot-rank {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: var(--bg); padding: 3px 10px; border-radius: 999px;
+    font-size: 12px; font-weight: 600; color: var(--ink-soft);
+    margin-bottom: 10px;
+  }
+  .novel-hot-card:nth-child(1) .hot-rank { background: #C0392B; color: #fff; }
+  .novel-hot-card:nth-child(2) .hot-rank { background: #E67E22; color: #fff; }
+  .novel-hot-card:nth-child(3) .hot-rank { background: var(--gold); color: #fff; }
+  .novel-hot-card .hot-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .novel-hot-card .hot-meta {
+    font-size: 12px; color: var(--ink-soft); display: flex; gap: 14px; flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+  .novel-hot-card .hot-meta span { display: flex; align-items: center; gap: 3px; }
+  .novel-hot-card .hot-intro {
+    font-size: 12.5px; line-height: 1.7; color: var(--ink-soft);
+    background: var(--bg); border-radius: 8px; padding: 10px 12px;
+  }
+  .novel-hot-card .hot-tags {
+    margin-top: 10px; display: flex; flex-wrap: wrap; gap: 5px;
+  }
+  .novel-hot-card .hot-tags span {
+    font-size: 11px; background: var(--orange-bg); color: var(--orange);
+    padding: 2px 8px; border-radius: 999px;
+  }
+
+  /* 小说拆解区 */
+  .dissect-card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+  }
+  .dissect-card h3 {
+    font-size: 15px; font-weight: 700; margin: 0 0 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .dissect-row {
+    display: flex; gap: 10px; padding: 8px 0;
+    border-bottom: 1px dashed var(--line);
+    font-size: 13px; line-height: 1.6;
+  }
+  .dissect-row:last-child { border-bottom: none; }
+  .dissect-row .dissect-lbl {
+    font-weight: 700; color: var(--orange); min-width: 55px;
+    flex-shrink: 0;
+  }
+  .dissect-row .dissect-val { color: var(--ink-soft); }
+
+  /* 练笔区 */
+  .writing-pad {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    box-shadow: var(--shadow);
+  }
+  .writing-pad h3 {
+    font-size: 15px; font-weight: 700; margin: 0 0 12px;
+  }
+  .writing-pad .prompt-box {
+    background: var(--bg); border-radius: 10px; padding: 14px 16px;
+    font-size: 13px; line-height: 1.8; color: var(--ink);
+    margin-bottom: 14px;
+    border-left: 3px solid var(--orange);
+  }
+  .writing-pad .prompt-box b { color: var(--orange); }
+  .writing-pad textarea {
+    width: 100%; min-height: 180px;
+    border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px; font-size: 13px; line-height: 1.8;
+    font-family: inherit; resize: vertical;
+    color: var(--ink); background: #FCFAF6;
+  }
+  .writing-pad textarea:focus {
+    outline: none; border-color: var(--orange);
+    box-shadow: 0 0 0 3px rgba(217,119,87,.12);
+  }
+  .writing-pad .pad-actions {
+    display: flex; gap: 10px; align-items: center; margin-top: 12px;
+  }
+  .writing-pad .word-count {
+    font-size: 12px; color: var(--ink-fade); margin-left: auto;
+  }
+
+  /* 学习日历 */
+  .learn-cal {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;
+  }
+  .learn-day {
+    background: #FFFCF8; border: 1px solid #f5efe5;
+    border-radius: 10px; padding: 14px;
+    font-size: 13px; line-height: 1.6;
+  }
+  .learn-day .day-num {
+    font-weight: 800; font-size: 18px; color: var(--orange);
+    margin-bottom: 4px;
+  }
+  .learn-day .day-task { color: var(--ink-soft); }
+  .learn-day .day-task b { color: var(--ink); }
+  .learn-day.done { opacity: .6; }
+  .learn-day.done .day-num { color: var(--down); }
+
+  @media (max-width: 768px) {
+    .novel-layout { grid-template-columns: 1fr; }
+    .novel-hot-grid { grid-template-columns: 1fr; }
+    .learn-cal { grid-template-columns: 1fr 1fr; }
+  }
+
   /* ================= 移动端 ================= */
   .menu-btn { display: none; }
   .scrim { display: none; }
@@ -731,10 +940,17 @@
       <li class="nav-item" data-view="view-camera"><span class="ico">📷</span>相机学习<span class="badge">NEW</span></li>
     </ul>
 
+    <div class="group-title">学习成长</div>
+    <ul class="nav">
+      <li class="nav-item" data-view="view-comic"><span class="ico">📺</span>漫剧制作<span class="badge">0→1</span></li>
+      <li class="nav-item" data-view="view-novel"><span class="ico">📖</span>小说制作<span class="badge">练笔</span></li>
+    </ul>
+
     <div class="sidebar-foot">
       <b>更新节奏</b><br>
       美妆 / 热点 / 新闻 · 每日早间<BR>
-      复盘 · 每日盘后
+      复盘 · 每日盘后<BR>
+      学习任务 · 每周刷新
     </div>
   </aside>
 
@@ -1511,6 +1727,373 @@
       </div>
     </section>
 
+    <!-- ==================== 漫剧制作 ==================== -->
+    <section class="view" id="view-comic">
+      <div class="comic-layout">
+
+        <!-- 左栏：学习路线图 -->
+        <div>
+          <div class="card" style="margin-bottom:16px;">
+            <h3 style="margin:0 0 14px;">🎯 从 0 到 1 · 漫剧制作学习路线</h3>
+            <p style="font-size:13px;color:var(--ink-soft);line-height:1.7;margin:0 0 16px;">
+              漫剧 = 漫画 + 动画 + 配音，把静态漫画变成动态短剧。<br>
+              热门平台：B站 / 抖音 / 快手。一集 1-3 分钟，节奏快、爽点密。
+            </p>
+
+            <!-- 阶段 1 -->
+            <div class="stage-card">
+              <div class="stage-header">
+                <div class="stage-num">1</div>
+                <div>
+                  <div class="stage-title">认知阶段 · 搞清楚"漫剧是什么"</div>
+                  <div class="stage-sub">预计 1-2 周 · 纯看纯学</div>
+                </div>
+              </div>
+              <ul class="checklist">
+                <li><input type="checkbox" class="chk"> 在 B 站搜"漫剧"看 30+ 热门作品，感受节奏和风格</li>
+                <li><input type="checkbox" class="chk"> 了解漫剧 vs 动画短片的本质区别（低成本、快节奏、爽文改编）</li>
+                <li><input type="checkbox" class="chk"> 确认自己喜欢的题材方向：言情 / 玄幻 / 悬疑 / 搞笑 / 治愈</li>
+                <li><input type="checkbox" class="chk"> 收藏 10 个对标账号，每天分析他们的爆款逻辑</li>
+              </ul>
+            </div>
+
+            <!-- 阶段 2 -->
+            <div class="stage-card">
+              <div class="stage-header">
+                <div class="stage-num">2</div>
+                <div>
+                  <div class="stage-title">工具阶段 · 学会用工具</div>
+                  <div class="stage-sub">预计 2-3 周 · 动手练习</div>
+                </div>
+              </div>
+              <ul class="checklist">
+                <li><input type="checkbox" class="chk"> 学习素材获取：漫画截图、免版权素材站、AI 生图</li>
+                <li><input type="checkbox" class="chk"> 学习剪辑软件基础操作（剪映 / Premiere / DaVinci）</li>
+                <li><input type="checkbox" class="chk"> 学习分镜基础：推拉摇移、转场、节奏把控</li>
+                <li><input type="checkbox" class="chk"> 动手做 1 个 30 秒练习短片（不看质量，只跑流程）</li>
+              </ul>
+            </div>
+
+            <!-- 阶段 3 -->
+            <div class="stage-card">
+              <div class="stage-header">
+                <div class="stage-num">3</div>
+                <div>
+                  <div class="stage-title">配音阶段 · 声音是灵魂</div>
+                  <div class="stage-sub">预计 1-2 周</div>
+                </div>
+              </div>
+              <ul class="checklist">
+                <li><input type="checkbox" class="chk"> 了解漫剧配音的风格特点（多角色、情绪饱满、语速偏快）</li>
+                <li><input type="checkbox" class="chk"> 学习 AI 配音工具：讯飞配音 / 魔音工坊 / ElevenLabs</li>
+                <li><input type="checkbox" class="chk"> 学习背景音乐和音效的搭配逻辑</li>
+                <li><input type="checkbox" class="chk"> 给练习短片配上声音</li>
+              </ul>
+            </div>
+
+            <!-- 阶段 4 -->
+            <div class="stage-card">
+              <div class="stage-header">
+                <div class="stage-num">4</div>
+                <div>
+                  <div class="stage-title">产出阶段 · 做出第一个完整作品</div>
+                  <div class="stage-sub">预计 3-4 周</div>
+                </div>
+              </div>
+              <ul class="checklist">
+                <li><input type="checkbox" class="chk"> 选一个短篇素材（500-1000 字），做完整改编</li>
+                <li><input type="checkbox" class="chk"> 从分镜 → 剪辑 → 配音 → 字幕 → 输出全流程走通</li>
+                <li><input type="checkbox" class="chk"> 反复打磨 3 遍以上，找朋友给反馈</li>
+                <li><input type="checkbox" class="chk"> 🎉 发布第一个作品！</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右栏：视频教程 + 工具推荐 + 每周任务 -->
+        <div>
+          <!-- 视频教程 -->
+          <div class="card" style="margin-bottom:16px;">
+            <h3 style="margin:0 0 14px;">🎬 视频教程 · 跟着学</h3>
+            <div class="comic-video-grid">
+              <a class="comic-video-item" href="https://search.bilibili.com/all?keyword=漫剧制作教程" target="_blank" rel="noopener">
+                <div class="play-dot">▶</div>
+                <div class="v-info">
+                  <div class="vt">B站搜索 · 漫剧制作教程</div>
+                  <div class="vs">从入门到发布全流程</div>
+                </div>
+              </a>
+              <a class="comic-video-item" href="https://search.bilibili.com/all?keyword=漫剧配音教程" target="_blank" rel="noopener">
+                <div class="play-dot">🎙️</div>
+                <div class="v-info">
+                  <div class="vt">B站搜索 · 漫剧配音</div>
+                  <div class="vs">角色配音 + AI配音技巧</div>
+                </div>
+              </a>
+              <a class="comic-video-item" href="https://search.bilibili.com/all?keyword=剪映+漫剧+剪辑" target="_blank" rel="noopener">
+                <div class="play-dot">✂️</div>
+                <div class="v-info">
+                  <div class="vt">B站搜索 · 剪映漫剧剪辑</div>
+                  <div class="vs">手机也能做漫剧</div>
+                </div>
+              </a>
+              <a class="comic-video-item" href="https://search.bilibili.com/all?keyword=漫画+分镜+教程" target="_blank" rel="noopener">
+                <div class="play-dot">🎞️</div>
+                <div class="v-info">
+                  <div class="vt">B站搜索 · 漫画分镜教程</div>
+                  <div class="vs">分镜基础 + 镜头语言</div>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <!-- 工具推荐 -->
+          <div class="card" style="margin-bottom:16px;">
+            <h3 style="margin:0 0 12px;">🛠️ 常用工具</h3>
+            <div class="tool-grid">
+              <div class="tool-item">
+                <div class="tool-ico">✂️</div>
+                <div class="tool-name">剪映</div>
+                <div class="tool-desc">手机/电脑通用</div>
+                <span class="tool-tag free">免费</span>
+              </div>
+              <div class="tool-item">
+                <div class="tool-ico">🎬</div>
+                <div class="tool-name">DaVinci Resolve</div>
+                <div class="tool-desc">专业调色+剪辑</div>
+                <span class="tool-tag free">免费</span>
+              </div>
+              <div class="tool-item">
+                <div class="tool-ico">🎙️</div>
+                <div class="tool-name">魔音工坊</div>
+                <div class="tool-desc">AI多角色配音</div>
+                <span class="tool-tag pro">付费</span>
+              </div>
+              <div class="tool-item">
+                <div class="tool-ico">🎨</div>
+                <div class="tool-name">Canva / 稿定</div>
+                <div class="tool-desc">封面设计</div>
+                <span class="tool-tag free">免费</span>
+              </div>
+              <div class="tool-item">
+                <div class="tool-ico">🤖</div>
+                <div class="tool-name">Midjourney / SD</div>
+                <div class="tool-desc">AI生成素材图</div>
+                <span class="tool-tag pro">付费</span>
+              </div>
+              <div class="tool-item">
+                <div class="tool-ico">📝</div>
+                <div class="tool-name">讯飞听见</div>
+                <div class="tool-desc">语音转字幕</div>
+                <span class="tool-tag free">免费</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 每周任务 -->
+          <div class="card">
+            <h3 style="margin:0 0 12px;">📋 本周学习任务 <span class="cam-week-tag">8月第2周</span></h3>
+            <div class="task-group" style="margin-bottom:0;">
+              <div class="task-item">
+                <input type="checkbox" id="comic_t1">
+                <label class="task-label" for="comic_t1">
+                  <b>任务一：看 10 个爆款漫剧</b> · B站/抖音搜"漫剧"，选10个点赞最高的看一遍
+                  <small>📝 看完写 3 句话笔记：这个爆在哪？吸引你的点是什么？</small>
+                </label>
+              </div>
+              <div class="task-item">
+                <input type="checkbox" id="comic_t2">
+                <label class="task-label" for="comic_t2">
+                  <b>任务二：确定你的第一个题材</b> · 言情/玄幻/悬疑/搞笑/治愈，选一个你最想做的
+                  <small>📝 想清楚：你擅长什么风格？什么类型的漫剧你最愿意做 100 集？</small>
+                </label>
+              </div>
+              <div class="task-item">
+                <input type="checkbox" id="comic_t3">
+                <label class="task-label" for="comic_t3">
+                  <b>任务三：安装好基础工具</b> · 下载剪映 + 注册 B站创作者账号
+                  <small>📝 不用急着学操作，先把工具装好，下周开始动手</small>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== 小说制作 ==================== -->
+    <section class="view" id="view-novel">
+      <div class="novel-layout">
+
+        <!-- 全宽：热门小说追踪 -->
+        <div class="novel-full">
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-head">
+              <h3>🔥 全网热门小说 · 帮你找到"该学什么"</h3>
+              <span class="more" style="cursor:default;font-size:11px;color:var(--ink-fade);">每日自动刷新</span>
+            </div>
+            <p style="font-size:12px;color:var(--ink-soft);margin:0 0 14px;">数据来源：起点 / 番茄 / 晋江 / 七猫 等主流平台实时热榜 · 学热门、拆结构、练笔力</p>
+            <div class="novel-hot-grid">
+
+              <div class="novel-hot-card">
+                <div class="hot-rank">🥇 起点月票榜 TOP1</div>
+                <div class="hot-title">待每日更新...</div>
+                <div class="hot-meta">
+                  <span>👤 作者</span><span>📚 连载中</span><span>⭐ 评分</span>
+                </div>
+                <div class="hot-intro">每天早晨自动更新当日热榜数据</div>
+                <div class="hot-tags"><span>男频</span><span>玄幻</span></div>
+              </div>
+
+              <div class="novel-hot-card">
+                <div class="hot-rank">🥈 番茄热搜 TOP1</div>
+                <div class="hot-title">待每日更新...</div>
+                <div class="hot-meta">
+                  <span>👤 作者</span><span>🔥 热度</span>
+                </div>
+                <div class="hot-intro">每天早晨自动更新当日热榜数据</div>
+                <div class="hot-tags"><span>女频</span><span>言情</span></div>
+              </div>
+
+              <div class="novel-hot-card">
+                <div class="hot-rank">🥉 晋江金榜 TOP1</div>
+                <div class="hot-title">待每日更新...</div>
+                <div class="hot-meta">
+                  <span>👤 作者</span><span>📚 字数</span><span>⭐ 收藏</span>
+                </div>
+                <div class="hot-intro">每天早晨自动更新当日热榜数据</div>
+                <div class="hot-tags"><span>女频</span><span>纯爱</span></div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- 左栏：拆解学习 -->
+        <div>
+          <div class="dissect-card">
+            <h3>🔍 每日拆解 · 热门小说学什么</h3>
+            <p style="font-size:12px;color:var(--ink-soft);margin:0 0 12px;">选一部热门小说，每天拆解 1-2 章</p>
+
+            <div class="dissect-row">
+              <span class="dissect-lbl">📖 书名</span>
+              <span class="dissect-val">（每日自动更新热门小说）</span>
+            </div>
+            <div class="dissect-row">
+              <span class="dissect-lbl">✍️ 开篇</span>
+              <span class="dissect-val">前3章怎么抓人？用了什么钩子？</span>
+            </div>
+            <div class="dissect-row">
+              <span class="dissect-lbl">👤 人设</span>
+              <span class="dissect-val">主角有什么让人记住的特点？反差在哪？</span>
+            </div>
+            <div class="dissect-row">
+              <span class="dissect-lbl">⚡ 节奏</span>
+              <span class="dissect-val">爽点/冲突/转折的密度是多少？一章几个爆点？</span>
+            </div>
+            <div class="dissect-row">
+              <span class="dissect-lbl">💬 对话</span>
+              <span class="dissect-val">对话推进剧情了吗？有没有废话？</span>
+            </div>
+            <div class="dissect-row">
+              <span class="dissect-lbl">🎯 金句</span>
+              <span class="dissect-val">有没有可以"借来用"的好句子？（改写不是抄）</span>
+            </div>
+          </div>
+
+          <!-- 学习日历 -->
+          <div class="card">
+            <h3 style="margin:0 0 12px;">📅 每日学习节奏</h3>
+            <div class="learn-cal">
+              <div class="learn-day">
+                <div class="day-num">周一</div>
+                <div class="day-task"><b>拆热门</b> · 找 1 部起点/番茄热榜小说，读前 5 章，写拆解笔记</div>
+              </div>
+              <div class="learn-day">
+                <div class="day-num">周二</div>
+                <div class="day-task"><b>仿写</b> · 从昨天拆的小说中挑一段精彩段落，用自己的话重写一遍</div>
+              </div>
+              <div class="learn-day">
+                <div class="day-num">周三</div>
+                <div class="day-task"><b>练人物</b> · 创造一个角色（300 字内），写清楚外貌+性格+动机+反差</div>
+              </div>
+              <div class="learn-day">
+                <div class="day-num">周四</div>
+                <div class="day-task"><b>练开场</b> · 写 3 个不同风格的小说开头（每个 100 字），练钩子能力</div>
+              </div>
+              <div class="learn-day">
+                <div class="day-num">周五</div>
+                <div class="day-task"><b>练冲突</b> · 写一段 500 字的"两人吵架"场景，对话为主，不要旁白</div>
+              </div>
+              <div class="learn-day">
+                <div class="day-num">周六</div>
+                <div class="day-task"><b>自由写</b> · 不限题材不限字数，写你当下最想写的东西</div>
+              </div>
+              <div class="learn-day">
+                <div class="day-num">周日</div>
+                <div class="day-task"><b>复盘 + 阅读</b> · 回顾本周练习，选一本好小说沉浸式阅读 1 小时</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右栏：练笔区 -->
+        <div>
+          <div class="writing-pad" style="margin-bottom:16px;">
+            <h3>✍️ 今日练笔</h3>
+            <div class="prompt-box">
+              <b>今日主题：</b>写一个让读者"停不下来"的小说开头<br>
+              <b>要求：</b>500 字以内，第一句话就要有悬念或冲突<br>
+              <b>小技巧：</b>可以试试"反套路"——大家都这么写，你偏不
+            </div>
+            <textarea placeholder="在这里写下你的文字...&#10;&#10;提示：&#10;• 别纠结完美，先写出来再改&#10;• 写完大声读一遍，不顺口的地方就是需要改的地方&#10;• 大胆用短句，长短交错更有节奏"></textarea>
+            <div class="pad-actions">
+              <button class="pill-btn">💾 保存练笔</button>
+              <span class="word-count">字数: 0</span>
+            </div>
+          </div>
+
+          <!-- 写作技巧速查 -->
+          <div class="dissect-card">
+            <h3>💡 写作技巧速查</h3>
+            <div class="dissect-row">
+              <span class="dissect-lbl">黄金三章</span>
+              <span class="dissect-val">前3章必须交代：主角是谁、他想要什么、阻碍是什么</span>
+            </div>
+            <div class="dissect-row">
+              <span class="dissect-lbl">爽点公式</span>
+              <span class="dissect-val">压抑 → 爆发 → 打脸。每 3-5 章必须有一个爽点</span>
+            </div>
+            <div class="dissect-row">
+              <span class="dissect-lbl">人设公式</span>
+              <span class="dissect-val">表面 + 内在 + 反差。比如：表面高冷学霸 → 私下是游戏宅</span>
+            </div>
+            <div class="dissect-row">
+              <span class="dissect-lbl">对话原则</span>
+              <span class="dissect-val">每个角色的说话方式必须不同。用口头禅、用词习惯区分</span>
+            </div>
+            <div class="dissect-row">
+              <span class="dissect-lbl">修改口诀</span>
+              <span class="dissect-val">写完放 1 天再看 → 删掉 20% → 重读 → 再删 10%</span>
+            </div>
+          </div>
+
+          <!-- 目标进度 -->
+          <div class="card">
+            <h3 style="margin:0 0 10px;">🎯 发表目标</h3>
+            <p style="font-size:13px;color:var(--ink-soft);line-height:1.7;margin:0;">
+              现阶段：<b style="color:var(--orange);">边学边写，不追求立刻发表</b><br>
+              短期目标：<b>完成 30 天练笔 → 写出 1 个满意的开头 → 连载 3 章试水</b><br>
+              中期目标：<b>在某平台发表第一部完整作品（哪怕只有 5 万字）</b><br>
+              <span style="font-size:11px;color:var(--ink-fade);">别急着发，先把基本功练扎实。写得多了，自然就有能发的东西。</span>
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
   </main>
 </div>
 
@@ -1559,7 +2142,9 @@
     'view-review':  '每日复盘 · 盘后波动解析',
     'view-xhs':     '小红书文库 · 爆款美妆文章',
     'view-douyin':  '抖音宠物号 · 账号打造',
-    'view-camera':  '📷 相机学习 · 富士 XM5'
+    'view-camera':  '📷 相机学习 · 富士 XM5',
+    'view-comic':   '📺 漫剧制作 · 从零到一',
+    'view-novel':   '📖 小说制作 · 拆解 + 练笔'
   };
 
   function showView(viewId) {
@@ -1898,6 +2483,36 @@
     dateText.textContent = fmt(new Date()) + ' · 已刷新';
     setTimeout(() => { dateText.textContent = fmt(new Date()); }, 1500);
   });
+
+  /* ============== 小说练笔字数统计 ============== */
+  (function(){
+    const ta = document.querySelector('#view-novel textarea');
+    const wc = document.querySelector('#view-novel .word-count');
+    if (ta && wc) {
+      ta.addEventListener('input', function(){
+        const text = this.value.trim();
+        // 中文字数：去掉空格后纯中文字符 + 英文单词
+        const cn = (text.match(/[\u4e00-\u9fff]/g) || []).length;
+        const en = (text.match(/[a-zA-Z]+/g) || []).length;
+        wc.textContent = '字数: ' + cn + '（中）+ ' + en + '（英）';
+      });
+      // 保存按钮
+      const saveBtn = document.querySelector('#view-novel .pad-actions .pill-btn');
+      if (saveBtn) {
+        saveBtn.addEventListener('click', function(){
+          const content = ta.value.trim();
+          if (!content) { alert('还没写东西呢~'); return; }
+          const ts = new Date().toISOString().slice(0,16).replace('T',' ');
+          const saved = JSON.parse(localStorage.getItem('novel_drafts') || '[]');
+          saved.unshift({ time: ts, text: content.slice(0,2000) });
+          if (saved.length > 20) saved.length = 20;
+          localStorage.setItem('novel_drafts', JSON.stringify(saved));
+          this.textContent = '✅ 已保存';
+          setTimeout(() => { this.textContent = '💾 保存练笔'; }, 2000);
+        });
+      }
+    }
+  })();
 </script>
 </body>
 </html>
