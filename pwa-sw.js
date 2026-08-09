@@ -1,7 +1,8 @@
-const CACHE = 'sanhao-workbench-v12';  // v12: 拦截 manifest.json 请求，替换为 pwa-manifest.json
+const CACHE = 'sanhao-workbench-v13';  // v13: 入口页改为 iframe/srcdoc，预缓存入口页，SW 不再承担 content-type 修复主责
 
 /* ---- 所有需要预缓存的资源（含 HTML） ---- */
 const PRECACHE_ASSETS = [
+  'pwa.xhtml',
   '工作台.html',
   'pwa-manifest.json',
   'icon-192.png',
