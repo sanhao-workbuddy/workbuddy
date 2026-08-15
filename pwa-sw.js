@@ -1,4 +1,4 @@
-const CACHE = 'sanhao-workbench-v14';  // v14: 主内容改用新文件名 app.html，避开 jsdelivr 对 工作台.html 的顽固缓存
+const CACHE = 'sanhao-workbench-v15';  // v15: 修复 app.html 与 工作台.html 同步问题
 
 /* ---- 所有需要预缓存的资源（含 HTML） ---- */
 const PRECACHE_ASSETS = [
